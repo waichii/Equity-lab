@@ -1,0 +1,745 @@
+<!doctype html>
+<html lang="zh-HK">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Equity 練習簿</title>
+<meta name="theme-color" content="#0E6B57">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Equity 練習簿">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{-webkit-text-size-adjust:100%}body{margin:0}[hidden]{display:none!important}</style>
+</head>
+<body>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: single study column; cards first, verdict right under them, range + sizing below. Suits use a 4-colour deck. */
+:root{
+  --bg:#EDF1EF; --surface:#FFFFFF; --ink:#14201C; --muted:#5A6A64; --line:#D2DBD7;
+  --accent:#0E6B57; --accent-soft:#D5EAE3; --accent-ink:#FFFFFF;
+  --good:#1D7A3E; --good-soft:#DCF0E2; --bad:#B3261E; --bad-soft:#F7DEDB; --tie:#9AA8A2;
+  --face:#FFFFFF; --face-line:#C9D2CE;
+  --spade:#1A1F1D; --heart:#C62828; --diamond:#1F5FBF; --club:#1E7B3A;
+  --cell-pair:#E4E9E7; --cell-s:#EEF2F0; --cell-o:#F6F8F7;
+  --t1:#0E6B57; --t2:#6FB3A2; --t3:#C98A1B; --t4:#BFC9C5;
+  --f-display:"Bricolage Grotesque","PingFang HK","Noto Sans HK",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans","PingFang HK","Noto Sans HK","Microsoft JhengHei",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0F1513; --surface:#18201D; --ink:#E3EBE7; --muted:#93A39C; --line:#2B3632;
+  --accent:#4FC3A1; --accent-soft:#1D3A31; --accent-ink:#06211A;
+  --good:#5BD38A; --good-soft:#163323; --bad:#FF7F73; --bad-soft:#3A1D1A; --tie:#5E6D67;
+  --face:#F1F3F0; --face-line:#F1F3F0;
+  --cell-pair:#26302C; --cell-s:#1F2825; --cell-o:#1B2421; --t1:#4FC3A1; --t2:#2E7D69; --t3:#E0A43A; --t4:#3D4A45; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0F1513; --surface:#18201D; --ink:#E3EBE7; --muted:#93A39C; --line:#2B3632;
+  --accent:#4FC3A1; --accent-soft:#1D3A31; --accent-ink:#06211A;
+  --good:#5BD38A; --good-soft:#163323; --bad:#FF7F73; --bad-soft:#3A1D1A; --tie:#5E6D67;
+  --face:#F1F3F0; --face-line:#F1F3F0;
+  --cell-pair:#26302C; --cell-s:#1F2825; --cell-o:#1B2421; --t1:#4FC3A1; --t2:#2E7D69; --t3:#E0A43A; --t4:#3D4A45; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px 40px}
+.app{max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+header{display:flex;flex-direction:column;gap:12px}
+h1{font-family:var(--f-display);font-weight:800;font-size:28px;line-height:1.1;margin:0;letter-spacing:-.01em;text-wrap:balance}
+.sub{margin:4px 0 0;color:var(--muted);font-size:13.5px}
+.tabs{display:grid;grid-template-columns:1fr 1fr;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:4px;gap:4px}
+.tabs button{font:600 15px var(--f-body);border:0;border-radius:9px;padding:9px;background:transparent;color:var(--muted);cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--accent);color:var(--accent-ink)}
+button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.label{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);display:flex;justify-content:space-between;gap:8px}
+.label span{text-transform:none;letter-spacing:0;font-weight:400}
+
+.slots{display:flex;gap:6px;flex-wrap:wrap}
+.slot{width:50px;height:68px;border-radius:8px;border:1.5px dashed var(--line);background:transparent;padding:0;cursor:pointer;display:grid;place-items:center;color:var(--muted);font:500 11px var(--f-body)}
+.slot.filled{border:0}
+.slot.active{border:2px solid var(--accent);border-style:solid}
+.slot.filled.active{outline:2px solid var(--accent);outline-offset:2px}
+.gapper{width:6px}
+.card{width:100%;height:100%;border-radius:8px;background:var(--face);border:1px solid var(--face-line);display:flex;flex-direction:column;align-items:flex-start;padding:4px 6px;font-family:var(--f-mono);line-height:1}
+.card b{font-size:20px;font-weight:700}
+.card i{font-style:normal;font-size:22px;margin-top:auto;align-self:flex-end}
+.c0{color:var(--spade)}.c1{color:var(--heart)}.c2{color:var(--diamond)}.c3{color:var(--club)}
+
+.picker{display:grid;grid-template-columns:repeat(13,minmax(0,1fr));gap:3px}
+.pk{aspect-ratio:.78;border-radius:5px;border:1px solid var(--face-line);background:var(--face);font:700 12px var(--f-mono);padding:0;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.05}
+.pk small{font-size:11px}
+.pk:disabled{opacity:.18;cursor:default}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.btn{font:600 14px var(--f-body);border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:8px 12px;cursor:pointer}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.on{background:var(--accent-soft);border-color:var(--accent);color:var(--ink)}
+
+.big{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.big .num{font-family:var(--f-mono);font-weight:700;font-size:44px;line-height:1;font-variant-numeric:tabular-nums}
+.big .cap{color:var(--muted);font-size:13px}
+.bar{display:flex;height:10px;border-radius:5px;overflow:hidden;background:var(--line)}
+.bar .w{background:var(--good)}.bar .t{background:var(--tie)}.bar .l{background:var(--bad)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.legend b{color:var(--ink);font-family:var(--f-mono);font-weight:500}
+.made{font-size:14px}
+.verdict{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 12px;border-radius:10px;font-size:14px}
+.verdict.good{background:var(--good-soft)}.verdict.bad{background:var(--bad-soft)}
+.chip{font:700 13px var(--f-body);padding:3px 10px;border-radius:999px;color:var(--surface)}
+.good .chip{background:var(--good)}.bad .chip{background:var(--bad)}
+.kv{display:grid;grid-template-columns:1fr auto;gap:4px 12px;font-size:14px}
+.kv dd{margin:0;font-family:var(--f-mono);font-variant-numeric:tabular-nums;text-align:right}
+.kv dt{color:var(--muted)}
+.msg{color:var(--muted);font-size:14px}
+
+.inputs{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.inputs label{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted)}
+.inputs input{font:500 16px var(--f-mono);padding:8px 10px;border-radius:9px;border:1px solid var(--line);background:var(--bg);color:var(--ink);width:100%;min-width:0}
+
+.grid{display:grid;grid-template-columns:repeat(13,minmax(0,1fr));gap:2px}
+.cell{aspect-ratio:1;border:0;border-radius:3px;font:600 9px var(--f-mono);padding:0;cursor:pointer;color:var(--muted);letter-spacing:-.03em;
+  background:color-mix(in srgb,var(--accent) calc(var(--w,0)*100%),var(--base))}
+.cell.p{--base:var(--cell-pair)}.cell.s{--base:var(--cell-s)}.cell.o{--base:var(--cell-o)}
+.cell.hi{color:var(--accent-ink)}
+.gsteps{display:flex;flex-direction:column;gap:8px}
+.gstep{display:grid;grid-template-columns:48px minmax(0,1fr);gap:8px;align-items:center}
+.gstep>span{font-size:13px;color:var(--muted);font-weight:600}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.cb{font:600 13px var(--f-body);padding:6px 11px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.cb[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.cb:disabled{opacity:.35;cursor:default}
+.hint{font-size:13.5px;background:var(--accent-soft);border-radius:10px;padding:8px 11px;line-height:1.55}
+.hint p{margin:0}.hint p+p{margin-top:4px}
+.hr{height:1px;background:var(--line)}
+.mix{display:flex;height:10px;border-radius:5px;overflow:hidden;background:var(--line)}
+.mix div{height:100%}
+.k1{background:var(--t1)}.k2{background:var(--t2)}.k3{background:var(--t3)}.k4{background:var(--t4)}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;vertical-align:0}
+@media (min-width:430px){.cell{font-size:10px}}
+
+.quizcards{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.quizcards .slot{cursor:default}
+.slider{display:flex;flex-direction:column;gap:6px}
+.slider input{width:100%;accent-color:var(--accent)}
+.guess{font:700 32px var(--f-mono);font-variant-numeric:tabular-nums}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat{display:flex;flex-direction:column;gap:2px}
+.stat b{font:700 20px var(--f-mono);font-variant-numeric:tabular-nums}
+.stat span{font-size:12px;color:var(--muted)}
+footer{color:var(--muted);font-size:12.5px;text-align:center;padding-top:4px}
+@media (prefers-reduced-motion:no-preference){.bar div{transition:width .3s ease}}
+</style>
+
+<div class="app">
+  <header>
+    <div>
+      <h1>Equity 練習簿</h1>
+      <p class="sub">打完牌之後 review，同埋練習估 equity 同 pot odds</p>
+    </div>
+    <div class="tabs" role="tablist">
+      <button id="tabCalc" role="tab" aria-selected="true">計算</button>
+      <button id="tabQuiz" role="tab" aria-selected="false">練習</button>
+    </div>
+  </header>
+
+  <section id="calc" style="display:flex;flex-direction:column;gap:14px">
+    <div class="panel">
+      <div class="label">你嘅手牌</div>
+      <div class="slots" id="heroSlots"></div>
+      <div class="label">公共牌 <span>Flop · Turn · River</span></div>
+      <div class="slots" id="boardSlots"></div>
+      <div class="picker" id="picker" aria-label="揀牌"></div>
+      <div class="row">
+        <button class="btn" id="clearBtn">清除牌</button>
+        <button class="btn" id="sampleBtn">載入例子</button>
+      </div>
+    </div>
+
+    <div class="panel" id="result" aria-live="polite"></div>
+
+    <div class="panel">
+      <div class="label">對手落注，你跟唔跟？</div>
+      <div class="inputs">
+        <label for="potIn">Pot（包括對手嘅注）<input id="potIn" type="number" inputmode="decimal" min="0" step="0.01" value="1.71"></label>
+        <label for="callIn">要跟幾多<input id="callIn" type="number" inputmode="decimal" min="0" step="0.01" value="0.56"></label>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="label">你想 bet 或者 bluff？ <span>對手 check 俾你嗰陣用</span></div>
+      <div class="inputs">
+        <label for="bpotIn">而家 pot<input id="bpotIn" type="number" inputmode="decimal" min="0" step="0.01" value="0.59"></label>
+        <label for="betIn">你想 bet 幾多<input id="betIn" type="number" inputmode="decimal" min="0" step="0.01" value="0.56"></label>
+      </div>
+      <div id="betOut" aria-live="polite" style="display:flex;flex-direction:column;gap:10px"></div>
+    </div>
+
+    <div class="panel">
+      <div class="label">對手 range <span id="rangeInfo"></span></div>
+      <div class="chips" id="oppRow"></div>
+      <div class="gsteps" id="guide"></div>
+      <div class="hint" id="hint"></div>
+      <div id="makeup"></div>
+      <div class="hr"></div>
+      <div class="label">手動調整 <span>撳格加減手牌類別</span></div>
+      <div class="row" id="presets"></div>
+      <div class="grid" id="grid"></div>
+      <div class="msg">顏色越深，代表嗰類手牌留喺 range 嘅比例越高。各個位置嘅 range 同收窄比例都係大約估計，用嚟幫你諗，唔係 solver 結果。</div>
+    </div>
+  </section>
+
+  <section id="quiz" hidden style="flex-direction:column;gap:14px">
+    <div class="panel">
+      <div class="stats">
+        <div class="stat"><b id="stN">0</b><span>題數</span></div>
+        <div class="stat"><b id="stC">–</b><span>決定正確</span></div>
+        <div class="stat"><b id="stE">–</b><span>平均誤差</span></div>
+      </div>
+    </div>
+    <div class="panel" id="qPanel"></div>
+    <div class="row"><button class="btn" id="resetStats">重設紀錄</button></div>
+  </section>
+
+  <footer>所有建議都係簡化模型：call 只按 pot odds 計，bet 只睇呢一條街。未計 implied odds 同之後幾條街嘅行動。</footer>
+</div>
+
+<script>
+/* ===== engine ===== */
+const RANKS="23456789TJQKA", SYM=["♠","♥","♦","♣"];
+const rl=r=>r===8?"10":RANKS[r];
+const CAT=["高牌","一對","兩對","三條","順子","同花","葫蘆","四條","同花順"];
+function straightHigh(mask){const m2=(mask<<1)|((mask>>12)&1);for(let t=13;t>=4;t--){if(((m2>>(t-4))&31)===31)return t}return -1}
+function enc(cat,a){let v=cat;for(let i=0;i<5;i++)v=v*16+(a[i]===undefined?0:a[i]+1);return v}
+function evalHand(cs){
+  const cnt=new Int8Array(13),sc=[0,0,0,0],sm=[0,0,0,0];let m=0;
+  for(let i=0;i<cs.length;i++){const c=cs[i],r=c>>2,s=c&3;cnt[r]++;sc[s]++;sm[s]|=1<<r;m|=1<<r}
+  for(let s=0;s<4;s++)if(sc[s]>=5){const st=straightHigh(sm[s]);if(st>=0)return enc(8,[st]);
+    const a=[];for(let r=12;r>=0&&a.length<5;r--)if(sm[s]&(1<<r))a.push(r);return enc(5,a)}
+  const q=[],t=[],p=[];for(let r=12;r>=0;r--){if(cnt[r]===4)q.push(r);else if(cnt[r]===3)t.push(r);else if(cnt[r]===2)p.push(r)}
+  const others=(ex,n)=>{const a=[];for(let r=12;r>=0&&a.length<n;r--)if(cnt[r]&&!ex.includes(r))a.push(r);return a};
+  if(q.length)return enc(7,[q[0],...others([q[0]],1)]);
+  if(t.length&&(t.length>1||p.length)){const sec=Math.max(t.length>1?t[1]:-1,p.length?p[0]:-1);return enc(6,[t[0],sec])}
+  const st=straightHigh(m);if(st>=0)return enc(4,[st]);
+  if(t.length)return enc(3,[t[0],...others([t[0]],2)]);
+  if(p.length>=2)return enc(2,[p[0],p[1],...others([p[0],p[1]],1)]);
+  if(p.length)return enc(1,[p[0],...others([p[0]],3)]);
+  return enc(0,others([],5));
+}
+const catOf=v=>Math.floor(v/1048576);
+/* combos: [cardA, cardB, weight, classKey] */
+function equity(hero,board,combos,iters){
+  const known=new Set([...hero,...board]);const deck=[];for(let c=0;c<52;c++)if(!known.has(c))deck.push(c);
+  const need=5-board.length;let w=0,t=0,l=0,curV,curW;
+  const H=hero.concat(board),V=board.slice();
+  const score=run=>{const h=evalHand(H.concat(run)),v=evalHand(run.concat(V,curV));if(h>v)w+=curW;else if(h===v)t+=curW;else l+=curW};
+  if(need<=1){
+    for(const vc of combos){curV=[vc[0],vc[1]];curW=vc[2];if(curW<=0)continue;
+      if(need===0)score([]);else for(const c of deck){if(c!==vc[0]&&c!==vc[1])score([c])}}
+    return{w,t,l,n:w+t+l,exact:true,sims:0};
+  }
+  const cum=[];let tot=0;for(const vc of combos){tot+=vc[2];cum.push(tot)}
+  const pickV=()=>{const x=Math.random()*tot;let lo=0,hi=cum.length-1;while(lo<hi){const m=(lo+hi)>>1;if(cum[m]>x)hi=m;else lo=m+1}return combos[lo]};
+  const run=new Array(need);curW=1;
+  for(let it=0;it<iters;it++){
+    const vc=pickV();curV=[vc[0],vc[1]];
+    let k=0;while(k<need){const c=deck[(Math.random()*deck.length)|0];
+      if(c===curV[0]||c===curV[1])continue;let dup=false;for(let j=0;j<k;j++)if(run[j]===c){dup=true;break}
+      if(!dup)run[k++]=c}
+    score(run.slice());
+  }
+  return{w,t,l,n:w+t+l,exact:false,sims:iters};
+}
+/* multiway Monte Carlo: lists = one weighted combo list per opponent */
+function equityMulti(hero,board,lists,iters){
+  const known=new Set([...hero,...board]);const deck=[];for(let c=0;c<52;c++)if(!known.has(c))deck.push(c);
+  const need=5-board.length,H=hero.concat(board);
+  const cums=lists.map(cs=>{const a=[];let t=0;for(const c of cs){t+=c[2];a.push(t)}return{a,t,cs}});
+  const pick=k=>{const{a,t,cs}=cums[k],x=Math.random()*t;let lo=0,hi=a.length-1;while(lo<hi){const m=(lo+hi)>>1;if(a[m]>x)hi=m;else lo=m+1}return cs[lo]};
+  let w=0,t=0,l=0,eq=0,n=0;
+  for(let it=0;it<iters;it++){
+    const used=new Set(),opp=[];let ok=true;
+    for(let k=0;k<lists.length;k++){let c,tries=0;do{c=pick(k);tries++}while((used.has(c[0])||used.has(c[1]))&&tries<40);
+      if(used.has(c[0])||used.has(c[1])){ok=false;break}used.add(c[0]);used.add(c[1]);opp.push(c)}
+    if(!ok)continue;
+    const run=[];while(run.length<need){const c=deck[(Math.random()*deck.length)|0];if(!used.has(c)&&!run.includes(c))run.push(c)}
+    const hv=evalHand(H.concat(run));let beaten=false,ties=0;
+    for(const o of opp){const v=evalHand([o[0],o[1],...board,...run]);if(v>hv){beaten=true;break}if(v===hv)ties++}
+    n++;if(beaten)l++;else if(ties){t++;eq+=1/(ties+1)}else{w++;eq+=1}
+  }
+  return{w,t,l,n,eq:eq/n,exact:false,sims:n};
+}
+/* hand classes */
+const CLASSES=[];
+(function(){const pts=r=>r===12?10:r===11?8:r===10?7:r===9?6:(r+2)/2;
+  for(let i=12;i>=0;i--)for(let j=12;j>=0;j--){
+    let hi,lo,type;if(i===j){hi=lo=i;type="p"}else if(i>j){hi=i;lo=j;type="s"}else{hi=j;lo=i;type="o"}
+    const key=RANKS[hi]+RANKS[lo]+(type==="p"?"":type);
+    let s=pts(hi);
+    if(type==="p")s=Math.max(5,s*2);else{if(type==="s")s+=2;const g=hi-lo-1;s-=g===0?0:g===1?1:g===2?2:g===3?4:5;if(g<=1&&hi<10)s+=1;s=Math.ceil(s)}
+    CLASSES.push({key,hi,lo,type,row:12-i,col:12-j,score:s,n:type==="p"?6:type==="s"?4:12});
+  }})();
+const ORDER=CLASSES.slice().sort((a,b)=>b.score-a.score||(b.type==="p")-(a.type==="p")||b.hi-a.hi||b.lo-a.lo||(a.type==="s"?-1:1));
+function topPct(p){const s=new Set();let cum=0;const target=p*1326/100;for(const c of ORDER){if(cum>=target)break;s.add(c.key);cum+=c.n}return s}
+function combosIn(set){let n=0;for(const c of CLASSES)if(set.has(c.key))n+=c.n;return n}
+function expand(set,dead){const out=[];for(const c of CLASSES){if(!set.has(c.key))continue;
+  for(let a=0;a<4;a++)for(let b=0;b<4;b++){
+    if(c.type==="p"&&b<=a)continue;if(c.type==="s"&&a!==b)continue;if(c.type==="o"&&a===b)continue;
+    const x=c.hi*4+a,y=c.lo*4+b;if(dead.has(x)||dead.has(y))continue;out.push([x,y,1,c.key])}}
+  return out}
+/* range notation parser: 22+, A2s+, KQo, 22-JJ, AQs-A9s, KJ */
+function parseRange(str){const s=new Set();
+  const add=(h,l,sfx)=>{if(h===l){s.add(RANKS[h]+RANKS[h]);return}const hi=Math.max(h,l),lo=Math.min(h,l),b=RANKS[hi]+RANKS[lo];
+    if(sfx!=="o")s.add(b+"s");if(sfx!=="s")s.add(b+"o")};
+  for(let tok of str.split(",")){tok=tok.trim();if(!tok)continue;const plus=tok.endsWith("+");if(plus)tok=tok.slice(0,-1);
+    const [a,b]=tok.split("-"),h=RANKS.indexOf(a[0]),l=RANKS.indexOf(a[1]),sfx=a[2]||"";
+    if(h===l){let lo=h,hi=plus?12:h;if(b){const o=RANKS.indexOf(b[0]);lo=Math.min(h,o);hi=Math.max(h,o)}for(let r=lo;r<=hi;r++)add(r,r)}
+    else{let lo=l,hi=plus?h-1:l;if(b){const o=RANKS.indexOf(b[1]);lo=Math.min(l,o);hi=Math.max(l,o)}for(let r=lo;r<=hi;r++)add(h,r,sfx)}}
+  return s}
+/* postflop hand tiers: M monster, S strong, Md medium, D draw, G gutshot, O overcards/ace-high, A air */
+function tierOf(h,board){
+  const v=evalHand([h[0],h[1],...board]),cat=catOf(v),bcat=catOf(evalHand(board));
+  const top=Math.max(...board.map(c=>c>>2)),r1=h[0]>>2,r2=h[1]>>2;
+  if(cat>bcat){
+    if(cat>=3)return"M";if(cat===2)return"S";
+    if(r1===r2)return r1>top?"S":"Md";
+    if(r1===top||r2===top)return"S";return"Md";
+  }
+  if(board.length<5){
+    for(let s=0;s<4;s++){const hs=(h[0]&3)===s||(h[1]&3)===s;if(!hs)continue;
+      let n=0;for(const c of [h[0],h[1],...board])if((c&3)===s)n++;if(n>=4)return"D"}
+    let mA=0,mB=0;for(const c of board)mB|=1<<(c>>2);mA=mB|(1<<r1)|(1<<r2);
+    let outs=0;for(let r=0;r<13;r++){if(mA&(1<<r))continue;if(straightHigh(mA|(1<<r))>=0&&straightHigh(mB|(1<<r))<0)outs++}
+    if(outs>=2)return"D";if(outs===1)return"G";
+  }
+  if(Math.min(r1,r2)>top||r1===12||r2===12)return"O";
+  return"A";
+}
+const WEIGHTS={
+  check:{M:.35,S:.7,Md:1,D:1,G:1,O:1,A:1},
+  callS:{M:.5,S:1,Md:1,D:1,G:.7,O:.45,A:.1},
+  callB:{M:.6,S:1,Md:.55,D:.85,G:.25,O:.1,A:.02},
+  small:{M:1,S:1,Md:.6,D:.8,G:.5,O:.3,A:.25},
+  big:{M:1,S:.8,Md:.15,D:.6,G:.2,O:.1,A:.15},
+  raise:{M:1,S:.5,Md:.05,D:.45,G:.1,O:.05,A:.12}};
+const GROUP={M:0,S:0,Md:1,D:2,G:2,O:3,A:3};
+const BLUFFY=t=>t==="G"||t==="O"||t==="A";
+function wAdj(act,tier,g){
+  let w=WEIGHTS[act][tier];
+  if(BLUFFY(tier)&&(act==="small"||act==="big"||act==="raise"))w*={low:.35,normal:1,high:2.5}[g.bluff||"normal"];
+  if((act==="callS"||act==="callB")&&tier!=="M"&&tier!=="S"){const f=g.fold||"normal";if(f==="sticky")w=1-(1-w)*.5;else if(f==="easy")w*=.7}
+  return Math.min(1,w)}
+/* chance each tier folds to a bet; interpolated between 1/3-pot and 3/4-pot sizing */
+const FOLD_S={M:0,S:.05,Md:.35,D:.25,G:.55,O:.65,A:.85},FOLD_B={M:0,S:.15,Md:.6,D:.4,G:.8,O:.9,A:.95};
+function foldProb(tier,ratio,g){const k=Math.max(0,Math.min(1,(ratio-.33)/.42));
+  const f=FOLD_S[tier]+(FOLD_B[tier]-FOLD_S[tier])*k;return Math.min(1,f*{easy:1.3,normal:1,sticky:.5}[g.fold||"normal"])}
+/* EV of betting vs checking, lists = weighted ranges, guides = opponent tendencies */
+function betEval(hero,board,lists,guides,pot,bet,eqNow,iters){
+  const ratio=bet/pot;let FE=1;const callers=[];
+  lists.forEach((cs,k)=>{let tot=0,fw=0;const cl=[];
+    for(const c of cs){const f=foldProb(tierOf(c,board),ratio,guides[k]);tot+=c[2];fw+=c[2]*f;if(c[2]*(1-f)>.001)cl.push([c[0],c[1],c[2]*(1-f),c[3]])}
+    FE*=tot?fw/tot:1;callers.push(cl)});
+  let eqC=null;
+  if(FE<.999&&callers.every(x=>x.length)){const r=callers.length>1?equityMulti(hero,board,callers,iters):equity(hero,board,callers[0],iters);eqC=callers.length>1?r.eq:(r.w+r.t/2)/r.n}
+  const n=lists.length,evBet=FE*pot+(1-FE)*((eqC??0)*(pot+bet*(n+1))-bet),evCheck=eqNow*pot;
+  return{FE,eqC,evBet,evCheck,be:bet/(pot+bet)};
+}
+/* ===== end engine ===== */
+
+/* preflop range tables (6-max, approx.) */
+const OPEN={
+  UTG:"22+,A2s+,K9s+,Q9s+,J9s+,T9s,98s,87s,76s,AJo+,KQo",
+  MP:"22+,A2s+,K8s+,Q9s+,J9s+,T8s+,97s+,86s+,75s+,65s,54s,ATo+,KJo+,QJo",
+  CO:"22+,A2s+,K5s+,Q8s+,J8s+,T7s+,96s+,86s+,75s+,64s+,54s,A8o+,KTo+,QTo+,JTo",
+  BTN:"22+,A2s+,K2s+,Q4s+,J6s+,T6s+,95s+,85s+,74s+,63s+,53s+,43s,A2o+,K8o+,Q9o+,J9o+,T8o+,98o",
+  SB:"22+,A2s+,K3s+,Q5s+,J7s+,T7s+,96s+,85s+,75s+,64s+,54s,A4o+,K9o+,Q9o+,J9o+,T9o"};
+/* facing an open: keyed by the opener's position */
+const THREEBET_VS={
+  UTG:"QQ+,AKs,AQs,AKo,A5s-A4s",
+  MP:"JJ+,AQs+,AKo,KQs,A5s-A4s",
+  CO:"TT+,AJs+,KQs,AQo+,A5s-A3s,K9s,76s,65s",
+  BTN:"99+,ATs+,KJs+,QJs,AJo+,KQo,A5s-A2s,K9s-K8s,T9s,87s,76s,65s",
+  SB:"88+,A8s+,KTs+,QTs+,JTs,ATo+,KJo+,A5s-A2s,K7s-K5s,Q9s,T9s,98s,87s,76s,65s,54s"};
+const CALL_VS={
+  UTG:"22-JJ,AJs-ATs,KQs-KJs,QJs,JTs,T9s,98s,AQo",
+  MP:"22-TT,AJs-ATs,KQs-KTs,QJs-QTs,JTs,T9s,98s,87s,AQo,KQo",
+  CO:"22-99,AJs-A9s,KJs-KTs,QJs-QTs,JTs,T9s,98s,87s,76s,AJo,KQo",
+  BTN:"22-88,AJs-ATs,KQs-KJs,QJs,JTs,T9s,98s,AQo"};
+const BB_VS={
+  UTG:"22-JJ,A2s-AJs,K9s-KQs,Q9s-QJs,J9s-JTs,T8s+,97s+,86s+,75s+,65s,54s,ATo-AQo,KJo-KQo,QJo",
+  MP:"22-TT,A2s-AJs,K7s-KQs,Q8s-QJs,J8s-JTs,T8s+,97s+,86s+,75s+,64s+,54s,ATo-AQo,KTo-KQo,QTo+,JTo",
+  CO:"22-99,A6s-ATs,K5s-KJs,Q6s-QJs,J7s-JTs,T7s+,96s+,85s+,74s+,64s+,53s+,43s,A7o-AQo,K9o-KQo,Q9o+,J9o+,T9o,98o",
+  BTN:"22-88,A6s-A9s,K2s-K7s,KTs-KJs,Q4s-QJs,J6s-JTs,T6s-T8s,95s+,85s+,74s+,63s+,53s+,43s,A2o-AJo,K7o-KJo,Q8o+,J8o+,T8o+,98o,87o",
+  SB:"22-77,A2s-A7s,K2s-K4s,K8s-K9s,Q2s-Q8s,J4s-J9s,T6s-T8s,95s-97s,85s-86s,74s-75s,63s-64s,53s,43s,A2o-A9o,K5o-KTo,Q8o-QJo,J8o-JTo,T8o-T9o,97o+,87o,76o"};
+/* after opening and facing a 3-bet: keyed by early (UTG/MP) or late (CO/BTN/SB) opener */
+const CALL3B={early:"JJ-88,AQs-AJs,KQs,AQo",late:"JJ-55,AQs-A9s,KQs-KTs,QJs-QTs,JTs,T9s,98s,87s,AQo-AJo,KQo"};
+const FOURBET={early:"QQ+,AKs,AKo,A5s",late:"JJ+,AKs,AKo,AQs,A5s-A3s"};
+const LIMP="22-99,A2s-AJs,K7s+,Q8s+,J8s+,T8s+,97s+,86s+,76s,65s,54s,A2o-AJo,K9o+,Q9o+,J9o+,T9o";
+const POS=["UTG","MP","CO","BTN","SB","BB"];
+const ACTS=[["open","Open raise"],["call","Call"],["threebet","3-bet"],["call3b","Open 後 call 3-bet"],["fourbet","4-bet"],["limp","Limp"]];
+const NEEDS_VS=a=>a==="call"||a==="threebet";
+const vsOptions=pos=>POS.slice(0,POS.indexOf(pos)).filter(p=>p!=="BB");
+const actOK=(pos,a)=>NEEDS_VS(a)?vsOptions(pos).length>0:pos!=="BB";
+function normGuide(g){
+  if(!actOK(g.pos,g.act))g.act=g.pos==="BB"?"call":"open";
+  if(NEEDS_VS(g.act)){const o=vsOptions(g.pos);if(!o.includes(g.vs))g.vs=o[o.length-1]}
+  return g}
+const TYPES=[["tight","緊"],["normal","一般"],["loose","鬆"]];
+const POST=[["check","Check"],["callS","Call 細注"],["callB","Call 大注"],["small","細注 bet"],["big","大注 bet"],["raise","Raise"]];
+const STREET={3:"Flop",4:"Turn",5:"River"};
+const POS_NOTE={UTG:"最早出聲，後面仲有 5 個人未講嘢，所以最緊。",MP:"比 UTG 闊少少。",CO:"後面只剩 3 個人，開始加多啲同花連張同細 Ax。",
+  BTN:"最後出聲、位置最好，係最闊嘅 open range。",SB:"後面只剩 BB，可以開得闊，但 postflop 冇位置。"};
+const VS_NOTE={UTG:"UTG open 得好緊（約 17%）",MP:"MP open 都幾緊（約 22%）",CO:"CO open 中等闊（約 29%）",BTN:"BTN open 好闊（約 45%）",SB:"SB 淨係對住 BB，open 得好闊（約 38%）"};
+function actNote(g){
+  const v=VS_NOTE[g.vs]||"";
+  if(g.act==="call"&&g.pos==="BB")return `${v}。BB 已經落咗 1bb，跟注只需要好少 equity，所以 call 得闊；對手 open 越闊，BB 防守就越闊。最強嘅牌會 3-bet，所以唔喺度。`;
+  if(g.act==="call")return `${v}。冇 3-bet 而淨係 call，多數係中等牌：細 pair、同花連張、AJ／KQ 呢類。最強嘅牌會 3-bet，所以唔喺度。對手越早位，call 嘅 range 都要越緊。`;
+  if(g.act==="threebet")return `${v}。3-bet 係強牌加少量 bluff，bluff 多數用 A5s、A4s 呢類有 A blocker 嘅同花牌。對手越後位、open 越闊，3-bet 就可以越闊。`;
+  if(g.act==="call3b")return "Open 完俾人 3-bet 再 call：中強牌，例如 JJ 至 88、AQ、同花大牌。最強嘅牌（QQ+、AK）多數會 4-bet。後位 open 嘅人 call 得闊啲。";
+  if(g.act==="fourbet")return "4-bet：幾乎淨係 QQ+ 同 AK，加少量 A5s 呢類 bluff。對住 4-bet，你手牌唔係好強就要好小心。";
+  if(g.act==="limp")return "Limp 嘅多數係娛樂型玩家。Range 好闊，但少咗最強嘅牌，因為佢哋有大牌通常會 raise。";
+  return POS_NOTE[g.pos]||"";
+}
+const TYPE_NOTE={tight:"緊：只保留最強嗰七成。",normal:"",loose:"鬆：再加多大約四成較弱嘅手牌，微注枱好多玩家都係咁打。"};
+const POST_NOTE={
+  check:"Check：有大牌嘅人唔會次次 check，所以 set、兩對呢啲最強嘅牌權重調低；其他牌照留。",
+  callS:"Call 細注（半個 pot 以下）：要求唔高，有 pair、有 draw，甚至淨係高張都會跟。冇嘢嘅空氣牌大部分走咗；最強嘅牌有時會 raise，所以權重減半。",
+  callB:"Call 大注（大約一個 pot）：要求高好多。中等 pair 少咗一半，弱 draw 同高張差唔多全部走晒，剩低多數係 top pair 以上同強 draw。",
+  small:"細注 bet：range 都幾闊，有價值牌、中等牌、draw，同埋少量 bluff。",
+  big:"大注 bet：多數係強牌或者強 draw，中等牌好少會咁打。",
+  raise:"Raise（包括 check-raise）：係最強嘅訊號。Set、兩對以上全部留低，top pair 只剩一半，中等牌幾乎冇，另外有少量 draw 同 bluff。"};
+
+const BLUFF_NOTE={low:"<b>Bluff 少</b>：佢落注多數係真牌，所以落注嗰陣，冇嘢同淨係高張嘅牌權重大減。佢落大注你就要 fold 多啲。",
+  high:"<b>Bluff 多</b>：佢冇嘢都成日落注，所以佢落注嘅 range 入面空氣牌多咗，你可以 call 闊啲。"};
+const FOLD_NOTE={easy:"<b>易 fold</b>：你 bluff 佢會成功多啲。",
+  sticky:"<b>唔肯 fold</b>（calling station）：佢中少少都會跟到尾。對住呢種人要少 bluff，多啲用好牌 value bet。"};
+function adjust(set,type){
+  if(type==="normal")return set;const tot=combosIn(set);
+  if(type==="tight"){const out=new Set();let cum=0;for(const c of ORDER){if(!set.has(c.key))continue;if(cum>=tot*.7)break;out.add(c.key);cum+=c.n}return out}
+  const out=new Set(set);let add=0;const target=Math.max(60,tot*.4),start=ORDER.findIndex(c=>set.has(c.key));
+  for(const c of ORDER.slice(Math.max(0,start))){if(add>=target)break;if(!out.has(c.key)){out.add(c.key);add+=c.n}}return out}
+function rangeStr(pos,act,vs){
+  const stage=pos==="UTG"||pos==="MP"?"early":"late";
+  if(act==="open")return OPEN[pos];
+  if(act==="call")return pos==="BB"?BB_VS[vs]:pos==="SB"?CALL_VS.UTG:CALL_VS[vs];
+  if(act==="threebet")return THREEBET_VS[vs];
+  if(act==="call3b")return CALL3B[stage];
+  if(act==="fourbet")return FOURBET[stage];
+  return LIMP}
+function baseFor(pos,act,type,vs){return adjust(parseRange(rangeStr(pos,act,vs)),type)}
+function scenarioName(pos,act,vs){
+  if(act==="call")return `${pos} call ${vs} 嘅 open`;
+  if(act==="threebet")return `${pos} 3-bet ${vs} 嘅 open`;
+  return `${pos} ${ACTS.find(a=>a[0]===act)[1]}`}
+
+const $=id=>document.getElementById(id);
+const cardHTML=c=>c==null?"":`<span class="card c${c&3}"><b>${rl(c>>2)}</b><i>${SYM[c&3]}</i></span>`;
+const pct=x=>(x*100).toFixed(1)+"%";
+
+/* calc state */
+let slots=[null,null,null,null,null,null,null],active=0,timer;
+const newOpp=(pos,act,vs)=>{const g=normGuide({pos,act,vs,type:"normal",custom:false,bluff:"normal",fold:"normal"});
+  return{guide:g,post:{3:null,4:null,5:null},range:baseFor(g.pos,g.act,"normal",g.vs)}};
+let opps=[newOpp("UTG","open")],cur=0,guide,post,range;
+const saveCur=()=>{opps[cur]={guide,post,range}};
+const loadCur=i=>{cur=i;({guide,post,range}=opps[i])};
+loadCur(0);
+const SLOT_HINT=["牌1","牌2","Flop","Flop","Flop","Turn","River"];
+const boardNow=()=>slots.slice(2).filter(x=>x!=null);
+
+function renderSlots(){
+  const mk=i=>`<button class="slot${slots[i]!=null?" filled":""}${active===i?" active":""}" data-i="${i}" aria-label="${SLOT_HINT[i]}">${slots[i]!=null?cardHTML(slots[i]):SLOT_HINT[i]}</button>`;
+  $("heroSlots").innerHTML=mk(0)+mk(1);
+  $("boardSlots").innerHTML=mk(2)+mk(3)+mk(4)+'<span class="gapper"></span>'+mk(5)+'<span class="gapper"></span>'+mk(6);
+  const used=new Set(slots.filter(x=>x!=null));
+  document.querySelectorAll(".pk").forEach(b=>b.disabled=used.has(+b.dataset.c));
+}
+function buildPicker(){let h="";for(let s=0;s<4;s++)for(let r=12;r>=0;r--){const c=r*4+s;
+  h+=`<button class="pk c${s}" data-c="${c}" aria-label="${rl(r)}${SYM[s]}">${rl(r)}<small>${SYM[s]}</small></button>`}
+  $("picker").innerHTML=h}
+document.addEventListener("click",e=>{
+  const sl=e.target.closest(".slot[data-i]");
+  if(sl&&sl.closest("#calc")){const i=+sl.dataset.i;if(slots[i]!=null){slots[i]=null;schedule()}active=i;renderSlots();return}
+  const pk=e.target.closest(".pk");
+  if(pk&&!pk.disabled){slots[active]=+pk.dataset.c;const nx=slots.findIndex(x=>x==null);active=nx<0?active:nx;renderSlots();schedule()}
+});
+$("clearBtn").onclick=()=>{slots=slots.map(()=>null);active=0;saveCur();opps.forEach(o=>o.post={3:null,4:null,5:null});loadCur(cur);renderSlots();schedule()};
+const cid=(r,s)=>RANKS.indexOf(r)*4+"shdc".indexOf(s);
+function loadSample(){
+  slots=[cid("Q","d"),cid("7","c"),cid("6","s"),cid("2","h"),cid("3","s"),cid("J","s"),null];active=6;
+  $("potIn").value="";$("callIn").value="";$("bpotIn").value="0.59";$("betIn").value="0.56";
+  opps=[newOpp("UTG","open")];opps[0].post={3:"check",4:"check",5:null};loadCur(0);renderSlots();schedule()}
+$("sampleBtn").onclick=loadSample;
+["potIn","callIn","bpotIn","betIn"].forEach(id=>$(id).addEventListener("input",schedule));
+
+/* guide UI */
+function chipRow(label,g,opts,cur,dis){
+  return `<div class="gstep"><span>${label}</span><div class="chips">${opts.map(([v,n])=>
+    `<button class="cb" data-g="${g}" data-v="${v}" aria-pressed="${cur===v}"${dis&&dis(v)?" disabled":""}>${n}</button>`).join("")}</div></div>`}
+function renderGuide(){
+  const bl=boardNow().length;for(const L of [3,4,5])if(bl<L)post[L]=null;
+  const taken=v=>opps.some((o,i)=>i!==cur&&!o.guide.custom&&o.guide.pos===v);
+  let orow=opps.map((o,i)=>`<button class="cb" data-o="${i}" aria-pressed="${i===cur}">對手 ${i+1} · ${o.guide.custom?"自訂":o.guide.pos}</button>`).join("");
+  if(opps.length<5)orow+=`<button class="cb" data-o="add">＋ 加對手</button>`;
+  if(opps.length>1)orow+=`<button class="cb" data-o="del">移除對手 ${cur+1}</button>`;
+  $("oppRow").innerHTML=orow;
+  let h=chipRow("位置","pos",POS.map(p=>[p,p]),guide.custom?null:guide.pos,taken)
+    +chipRow("Preflop","act",ACTS,guide.custom?null:guide.act,v=>!actOK(guide.pos,v))
+    +(NEEDS_VS(guide.act)&&!guide.custom?chipRow("對住","vs",vsOptions(guide.pos).map(p=>[p,p+" open"]),guide.vs):"")
+    +chipRow("類型","type",TYPES,guide.custom?null:guide.type)
+    +chipRow("Bluff","bluff",[["low","少"],["normal","正常"],["high","多"]],guide.bluff)
+    +chipRow("Fold","fold",[["easy","易 fold"],["normal","正常"],["sticky","唔肯 fold"]],guide.fold);
+  for(const L of [3,4,5])if(bl>=L)h+=chipRow(STREET[L],"post"+L,POST,post[L]);
+  $("guide").innerHTML=h;
+  const lines=[];
+  if(guide.custom)lines.push("你已經手動改咗 range。撳上面嘅位置或者行動就會用返嚮導。");
+  else{
+    const n=combosIn(range);
+    const first=`<b>${scenarioName(guide.pos,guide.act,guide.vs)}</b>：大約 ${(n/1326*100).toFixed(0)}% 手牌。`+actNote(guide);
+    lines.push(first);if(TYPE_NOTE[guide.type])lines.push(TYPE_NOTE[guide.type]);
+  }
+  if(guide.bluff!=="normal")lines.push(BLUFF_NOTE[guide.bluff]);
+  if(guide.fold!=="normal")lines.push(FOLD_NOTE[guide.fold]);
+  for(const L of [3,4,5])if(post[L])lines.push(`<b>${STREET[L]}</b> ${POST_NOTE[post[L]]}`);
+  if(bl>=3&&!post[3])lines.push("揀對手喺每條街做咗咩，range 就會跟住收窄。");
+  $("hint").innerHTML=lines.map(x=>`<p>${x}</p>`).join("");
+}
+$("oppRow").addEventListener("click",e=>{
+  const b=e.target.closest("[data-o]");if(!b)return;const v=b.dataset.o;saveCur();
+  if(v==="add"){const free=["BB","BTN","CO","SB","MP","UTG"].find(p=>!opps.some(o=>!o.guide.custom&&o.guide.pos===p))||"BB";
+    const o=newOpp(free,"call",opps[cur].guide.custom?undefined:opps[cur].guide.pos);o.post={...opps[cur].post};opps.push(o);loadCur(opps.length-1)}
+  else if(v==="del"){opps.splice(cur,1);loadCur(Math.max(0,cur-1))}
+  else loadCur(+v);
+  schedule();
+});
+$("guide").addEventListener("click",e=>{
+  const b=e.target.closest(".cb");if(!b||b.disabled)return;const g=b.dataset.g,v=b.dataset.v;
+  if(g==="bluff"||g==="fold"){guide[g]=v;schedule();return}
+  if(g.startsWith("post")){const L=+g.slice(4);post[L]=post[L]===v?null:v;schedule();return}
+  if(guide.custom){guide.custom=false}
+  guide[g]=v;
+  normGuide(guide);
+  range=baseFor(guide.pos,guide.act,guide.type,guide.vs);schedule();
+});
+
+/* build weighted combos for the calc tab */
+function combosFor(o,board,dead){
+  const combos=expand(o.range,dead);
+  for(const L of [3,4,5]){if(!o.post[L]||board.length<L)continue;const bd=board.slice(0,L);
+    for(const c of combos)c[2]*=wAdj(o.post[L],tierOf(c,bd),o.guide)}
+  return combos;
+}
+function buildCombos(){
+  saveCur();
+  const board=boardNow(),hero=slots.slice(0,2).filter(x=>x!=null),dead=new Set([...hero,...board]);
+  const alls=opps.map(o=>combosFor(o,board,dead)),lists=alls.map(a=>a.filter(c=>c[2]>0.001));
+  return{combos:lists[cur],all:alls[cur],lists,board,hero,dead};
+}
+
+const PRESETS=[["全部",100],["50%",50],["30%",30],["15%",15],["7%",7]];
+$("presets").innerHTML=PRESETS.map(([n,p])=>`<button class="btn" data-p="${p}">${n}</button>`).join("")+`<button class="btn" data-p="0">清空</button>`;
+$("presets").onclick=e=>{const b=e.target.closest("[data-p]");if(!b)return;const p=+b.dataset.p;range=p?topPct(p):new Set();guide.custom=true;schedule()};
+function renderGrid(all,dead){
+  const sum={},cnt={};for(const c of all){sum[c[3]]=(sum[c[3]]||0)+c[2];cnt[c[3]]=(cnt[c[3]]||0)+1}
+  const cells=CLASSES.slice().sort((a,b)=>a.row-b.row||a.col-b.col);
+  $("grid").innerHTML=cells.map(c=>{const w=cnt[c.key]?sum[c.key]/cnt[c.key]:(range.has(c.key)?1:0);
+    return `<button class="cell ${c.type}${w>.5?" hi":""}" style="--w:${w.toFixed(2)}" data-k="${c.key}" aria-pressed="${range.has(c.key)}">${c.key}</button>`}).join("");
+  let n=0;for(const c of all)n+=c[2];
+  $("rangeInfo").textContent=`≈${Math.round(n)} 個組合 · ${(n/1326*100).toFixed(1)}%`;
+}
+$("grid").onclick=e=>{const b=e.target.closest(".cell");if(!b)return;const k=b.dataset.k;range=new Set(range);range.has(k)?range.delete(k):range.add(k);guide.custom=true;schedule()};
+function renderMakeup(combos,board){
+  if(board.length<3||!combos.length){$("makeup").innerHTML="";return}
+  const g=[0,0,0,0];let tot=0;for(const c of combos){g[GROUP[tierOf(c,board)]]+=c[2];tot+=c[2]}
+  const names=["強牌（top pair 以上）","中等牌（其他 pair）","Draw","冇嘢／高張"];
+  $("makeup").innerHTML=`<div class="label" style="margin-bottom:6px">而家對手 range 嘅組成</div>
+  <div class="mix">${g.map((x,i)=>`<div class="k${i+1}" style="width:${x/tot*100}%"></div>`).join("")}</div>
+  <div class="legend" style="margin-top:6px">${g.map((x,i)=>`<span><i class="dot k${i+1}"></i>${names[i]} <b>${(x/tot*100).toFixed(0)}%</b></span>`).join("")}</div>`;
+}
+
+function schedule(){clearTimeout(timer);saveCur();renderGuide();$("result").innerHTML='<div class="msg">計算中…</div>';timer=setTimeout(compute,40)}
+function compute(){
+  const R=$("result"),{combos,all,lists,board,hero,dead}=buildCombos();$("betOut").innerHTML="";
+  renderGrid(all,dead);renderMakeup(combos,board);
+  if(hero.length<2){R.innerHTML='<div class="msg">揀你兩張手牌開始。</div>';return}
+  if(board.length===1||board.length===2){R.innerHTML='<div class="msg">公共牌要 0、3、4 或 5 張。</div>';return}
+  const empty=lists.findIndex(x=>!x.length);
+  if(empty>=0){R.innerHTML=`<div class="msg">對手 ${empty+1} 嘅 range 入面冇手牌。揀返位置，或者喺格度加啲手牌。</div>`;return}
+  const multi=lists.length>1;
+  const r=multi?equityMulti(hero,board,lists,30000):equity(hero,board,combos,30000),eq=multi?r.eq:(r.w+r.t/2)/r.n;
+  const pot=parseFloat($("potIn").value)||0,call=parseFloat($("callIn").value)||0;
+  let made="";if(board.length>=3)made=`<div class="made">你而家：<b>${CAT[catOf(evalHand(hero.concat(board)))]}</b></div>`;
+  let pv="";
+  if(call>0){const req=call/(pot+call),ev=eq*(pot+call)-call,ok=eq>=req;
+    pv=`<dl class="kv"><dt>需要 equity</dt><dd>${pct(req)}</dd><dt>Call 嘅 EV</dt><dd>${ev>=0?"+":""}${ev.toFixed(2)}</dd></dl>
+    <div class="verdict ${ok?"good":"bad"}"><span class="chip">${ok?"Call +EV":"Fold"}</span><span>${ok?"Equity 高過 pot odds 要求":"Equity 唔夠 pot odds 要求"}</span></div>`}
+  else pv='<div class="msg">輸入要跟嘅注碼就會計 pot odds。</div>';
+  const mw=multi?`<div class="msg">多人底池：你要同時贏晒 ${lists.length} 個對手先算贏，所以 equity 會明顯低過單挑。</div>`:"";
+  R.innerHTML=`<div class="label">你嘅 equity <span>對 ${lists.length} 個對手 · ${r.exact?"精確計算":"模擬 "+r.sims.toLocaleString()+" 次"}</span></div>
+  <div class="big"><span class="num">${pct(eq)}</span></div>
+  <div class="bar"><div class="w" style="width:${r.w/r.n*100}%"></div><div class="t" style="width:${r.t/r.n*100}%"></div><div class="l" style="width:${r.l/r.n*100}%"></div></div>
+  <div class="legend"><span>贏 <b>${pct(r.w/r.n)}</b></span><span>和 <b>${pct(r.t/r.n)}</b></span><span>輸 <b>${pct(r.l/r.n)}</b></span></div>${mw}${made}${pv}`;
+  renderBet(hero,board,lists,eq);
+}
+
+function betKind(eqC,board){if(eqC==null)return"";if(eqC>=.5)return"Value bet：俾人 call 你都多數贏。";
+  if(eqC>=.25&&board.length<5)return"半 bluff：俾人 call 都仲有機會中牌。";return"純 bluff：主要靠對手 fold。"}
+function renderBet(hero,board,lists,eqNow){
+  const O=$("betOut"),pot=parseFloat($("bpotIn").value)||0,bet=parseFloat($("betIn").value)||0;
+  if(board.length<3){O.innerHTML='<div class="msg">Bet 分析要有 flop 之後先用得到。</div>';return}
+  if(!(pot>0&&bet>0)){O.innerHTML='<div class="msg">輸入而家 pot 同你想 bet 幾多。</div>';return}
+  const b=betEval(hero,board,lists,opps.map(o=>o.guide),pot,bet,eqNow,20000),better=b.evBet>b.evCheck;
+  O.innerHTML=`<dl class="kv"><dt>${lists.length>1?"全部對手 fold 嘅機會":"對手 fold 嘅機會"}</dt><dd>${pct(b.FE)}</dd>
+  <dt>純 bluff 要幾多 fold 先唔蝕</dt><dd>${pct(b.be)}</dd>
+  <dt>俾人 call 之後你嘅 equity</dt><dd>${b.eqC==null?"–":pct(b.eqC)}</dd>
+  <dt>Bet 嘅 EV</dt><dd>${b.evBet>=0?"+":""}${b.evBet.toFixed(2)}</dd>
+  <dt>Check 嘅 EV（當直接攤牌）</dt><dd>+${b.evCheck.toFixed(2)}</dd></dl>
+  <div class="verdict ${better?"good":"bad"}"><span class="chip">${better?"Bet 較好":"Check 較好"}</span><span>${betKind(b.eqC,board)}</span></div>
+  <div class="msg">Fold 機會係按對手 range 入面每類牌通常點反應估出嚟。Check 嘅 EV 當你免費攤牌，未計對手之後會唔會 bet。</div>`;
+}
+/* tabs */
+function setTab(q){$("tabCalc").setAttribute("aria-selected",!q);$("tabQuiz").setAttribute("aria-selected",q);
+  $("calc").hidden=q;$("calc").style.display=q?"none":"flex";$("quiz").hidden=!q;$("quiz").style.display=q?"flex":"none";if(q&&!Q)newQuiz()}
+$("tabCalc").onclick=()=>setTab(false);$("tabQuiz").onclick=()=>setTab(true);
+
+/* quiz */
+let Q=null,stats={n:0,c:0,e:0,g:0};
+try{const s=JSON.parse(localStorage.getItem("eqlab-stats")||"null");if(s&&typeof s.n==="number")stats={...s,g:s.g??s.n}}catch(e){}
+const saveStats=()=>{try{localStorage.setItem("eqlab-stats",JSON.stringify(stats))}catch(e){}};
+function renderStats(){$("stN").textContent=stats.n;$("stC").textContent=stats.n?Math.round(stats.c/stats.n*100)+"%":"–";$("stE").textContent=stats.g?"±"+(stats.e/stats.g).toFixed(1):"–"}
+const pick=a=>a[(Math.random()*a.length)|0];
+const SCEN=[["UTG","open"],["MP","open"],["CO","open"],["BTN","open"],["BTN","open"],["SB","open"],["BB","call","BTN"],["BB","call","CO"],["BB","call","SB"],["CO","call","MP"],["BTN","call","CO"],["BTN","threebet","CO"],["CO","call3b"],["MP","limp"]];
+function newQuiz(){
+  const d=[...Array(52).keys()];for(let i=51;i>0;i--){const j=(Math.random()*(i+1))|0;[d[i],d[j]]=[d[j],d[i]]}
+  const hero=[d[0],d[1]],street=pick([3,3,4,4,5]),board=d.slice(2,2+street);
+  const pot=Math.round(4+Math.random()*36),frac=pick([.33,.5,.5,.75,1]),bet=Math.max(1,Math.round(pot*frac*10)/10),big=frac>=.75;
+  const roll=Math.random();
+  if(roll<.25)return newPreQuiz();
+  if(roll<.5)return newBluffQuiz(hero,board,pot);
+  const nOpp=Math.random()<.3?2:1,dead=new Set([...hero,...board]),names=[],lists=[];
+  let s1=pick(SCEN);
+  for(let k=0;k<nOpp;k++){
+    let sc=s1;if(k===1){const others=SCEN.filter(x=>x[0]!==s1[0]&&x[1]==="call");sc=pick(others.length?others:[["BB","call","BTN"]])}
+    const set=baseFor(sc[0],sc[1],"normal",sc[2]),cs=expand(set,dead),W=WEIGHTS[k===0?(big?"big":"small"):(big?"callB":"callS")];
+    for(const c of cs)c[2]*=W[tierOf(c,board)];lists.push(cs.filter(c=>c[2]>0.001));
+    names.push(`${scenarioName(sc[0],sc[1],sc[2])}（約 ${Math.round(combosIn(set)/1326*100)}%）· ${k===0?"落注":"跟注"}`);
+  }
+  const r=nOpp>1?equityMulti(hero,board,lists,20000):equity(hero,board,lists[0],20000);
+  const total=pot+bet*(nOpp+1);
+  Q={hero,board,names,pot,bet,frac,callers:nOpp-1,total,eq:nOpp>1?r.eq:(r.w+r.t/2)/r.n,req:bet/total,answered:false,guess:50};
+  renderQuiz();
+}
+/* preflop decision for the hero, graded against the same range tables */
+function preAction(pos,vs,key){
+  if(!vs)return parseRange(OPEN[pos]).has(key)?"raise":"fold";
+  if(parseRange(THREEBET_VS[vs]).has(key))return"3bet";
+  if(parseRange(rangeStr(pos,"call",vs)).has(key))return"call";
+  return"fold"}
+function newPreQuiz(){
+  const rfi=Math.random()<.45;let pos,vs;
+  if(rfi)pos=pick(["UTG","MP","CO","BTN","SB"]);else{pos=pick(["MP","CO","BTN","SB","BB","BB"]);vs=pick(vsOptions(pos))}
+  const ref=rfi?parseRange(OPEN[pos]):new Set([...parseRange(THREEBET_VS[vs]),...parseRange(rangeStr(pos,"call",vs))]);
+  const cutoff=Math.min(ORDER.length-1,ORDER.findIndex(c=>!ref.has(c.key)&&ORDER.indexOf(c)>20)+25);
+  const cls=Math.random()<.8?ORDER[(Math.random()*Math.max(1,cutoff))|0]:pick(CLASSES);
+  const sA=(Math.random()*4)|0;let sB=cls.type==="s"?sA:(sA+1+((Math.random()*3)|0))%4;
+  const hero=[cls.hi*4+sA,cls.lo*4+sB];
+  Q={kind:"pre",hero,pos,vs,key:cls.key,ans:null,answered:false,best:preAction(pos,vs,cls.key)};
+  renderQuiz();
+}
+function chartHTML(pos,vs,hl){
+  const cells=CLASSES.slice().sort((a,b)=>a.row-b.row||a.col-b.col);
+  return `<div class="grid">${cells.map(c=>{const a=preAction(pos,vs,c.key),w=a==="fold"?0:a==="call"?.45:1;
+    return `<span class="cell ${c.type}${w>.5?" hi":""}" style="--w:${w};${c.key===hl?"outline:2px solid var(--ink);outline-offset:-1px;":""}">${c.key}</span>`}).join("")}</div>`}
+function renderPreQuiz(){
+  const cards=a=>a.map(c=>`<span class="slot filled">${cardHTML(c)}</span>`).join("");
+  const opts=Q.vs?[["fold","Fold"],["call","Call"],["3bet","3-bet"]]:[["fold","Fold"],["raise","Raise"]];
+  const NAME={fold:"Fold",call:"Call",raise:"Raise","3bet":"3-bet"};
+  let h=`<div class="label">Preflop 題 · 你嘅手牌</div><div class="quizcards">${cards(Q.hero)}</div>
+  <dl class="kv"><dt>你嘅位置</dt><dd>${Q.pos}</dd><dt>前面</dt><dd>${Q.vs?Q.vs+" open raise，其他人 fold":"全部 fold 到你"}</dd></dl>`;
+  if(!Q.answered){h+=`<div class="row">${opts.map(([v,n],i)=>`<button class="btn${i===opts.length-1?" primary":""}" data-a="${v}">${n}</button>`).join("")}</div>`}
+  else{
+    const ok=Q.ans===Q.best;
+    const why=Q.vs?`${VS_NOTE[Q.vs]}。${Q.pos==="BB"?"BB 已經落咗 1bb，可以防守得闊啲。":Q.pos==="SB"?"SB 之後仲有 BB，又冇位置，所以多數唔 call，係 3-bet 或者 fold。":"你喺佢後面有位置，但後面仲有人，call 要揀可以打 postflop 嘅牌。"}`:POS_NOTE[Q.pos];
+    h+=`<div class="verdict ${ok?"good":"bad"}"><span class="chip">${ok?"答啱":"答錯"}</span><span>參考答案：<b>${NAME[Q.best]}</b>，你揀咗 ${NAME[Q.ans]}</span></div>
+    <div class="msg">${why}</div>
+    <div class="label">呢個情況嘅參考 range <span>${Q.vs?"深色 3-bet · 淺色 call":"深色 raise"} · 框住係你手牌</span></div>${chartHTML(Q.pos,Q.vs,Q.key)}
+    <div class="row"><button class="btn primary" id="nextQ">下一題</button></div>`}
+  $("qPanel").innerHTML=h;renderStats();
+}
+function newBluffQuiz(hero,board,pot){
+  const sc=pick(SCEN),set=baseFor(sc[0],sc[1],"normal",sc[2]),g={fold:pick(["easy","normal","normal","sticky"])};
+  const cs=expand(set,new Set([...hero,...board]));for(const c of cs)c[2]*=WEIGHTS.check[tierOf(c,board)];
+  const list=cs.filter(c=>c[2]>.001),now=equity(hero,board,list,15000),eqNow=(now.w+now.t/2)/now.n;
+  const frac=pick([.5,.75,1]),bet=Math.max(1,Math.round(pot*frac*10)/10),b=betEval(hero,board,[list],[g],pot,bet,eqNow,15000);
+  Q={kind:"bet",hero,board,pot,bet,frac,fold:g.fold,name:`${scenarioName(sc[0],sc[1],sc[2])}（約 ${Math.round(combosIn(set)/1326*100)}%）`,...b,eqNow,answered:false,guess:50};
+  renderQuiz();
+}
+function renderBetQuiz(){
+  const st=["","","","Flop","Turn","River"][Q.board.length];
+  const cards=a=>a.map(c=>`<span class="slot filled">${cardHTML(c)}</span>`).join("");
+  const fl={easy:"易 fold",normal:"正常",sticky:"唔肯 fold"}[Q.fold];
+  let h=`<div class="label">Bluff 題 · 你嘅手牌</div><div class="quizcards">${cards(Q.hero)}</div>
+  <div class="label">公共牌 <span>${st}</span></div><div class="quizcards">${cards(Q.board)}</div>
+  <dl class="kv"><dt>對手 preflop</dt><dd>${Q.name}</dd><dt>對手類型</dt><dd>${fl}</dd><dt>Pot</dt><dd>${Q.pot} bb</dd><dt>對手</dt><dd>Check 俾你</dd></dl>`;
+  if(!Q.answered){
+    h+=`<div class="slider"><label for="gIn" class="label">你估落 ${Q.bet} bb（${Math.round(Q.frac*100)}% pot）佢會 fold 幾多？</label><div class="guess" id="gOut">${Q.guess}%</div>
+    <input id="gIn" type="range" min="0" max="100" value="${Q.guess}"></div>
+    <div class="row"><button class="btn primary" data-a="bet">Bet ${Q.bet} bb</button><button class="btn" data-a="check">Check</button></div>`;
+  }else{
+    const best=Q.evBet>Q.evCheck?"bet":"check",ok=Q.ans===best,err=Math.abs(Q.guess-Q.FE*100);
+    h+=`<div class="verdict ${ok?"good":"bad"}"><span class="chip">${ok?"答啱":"答錯"}</span><span>較好嘅選擇：<b>${best==="bet"?"Bet":"Check"}</b>。${betKind(Q.eqC,Q.board)}</span></div>
+    <dl class="kv"><dt>對手 fold 機會</dt><dd>${pct(Q.FE)}</dd><dt>你估</dt><dd>${Q.guess}%（差 ${err.toFixed(1)}）</dd><dt>純 bluff 要幾多 fold</dt><dd>${pct(Q.be)}</dd>
+    <dt>俾人 call 之後 equity</dt><dd>${Q.eqC==null?"–":pct(Q.eqC)}</dd><dt>Bet EV</dt><dd>${Q.evBet>=0?"+":""}${Q.evBet.toFixed(2)} bb</dd><dt>Check EV</dt><dd>+${Q.evCheck.toFixed(2)} bb</dd></dl>
+    <div class="row"><button class="btn primary" id="nextQ">下一題</button></div>`;
+  }
+  $("qPanel").innerHTML=h;renderStats();
+  const g=$("gIn");if(g)g.oninput=()=>{Q.guess=+g.value;$("gOut").textContent=g.value+"%"};
+}
+function renderQuiz(){
+  if(Q.kind==="bet")return renderBetQuiz();
+  if(Q.kind==="pre")return renderPreQuiz();
+  const st=["","","","Flop","Turn","River"][Q.board.length];
+  const cards=a=>a.map(c=>`<span class="slot filled">${cardHTML(c)}</span>`).join("");
+  let h=`<div class="label">你嘅手牌</div><div class="quizcards">${cards(Q.hero)}</div>
+  <div class="label">公共牌 <span>${st}</span></div><div class="quizcards">${cards(Q.board)}</div>
+  <dl class="kv">${Q.names.map((n,i)=>`<dt>對手 ${i+1}</dt><dd>${n}</dd>`).join("")}<dt>Pot（落注前）</dt><dd>${Q.pot} bb</dd><dt>對手 1 bet</dt><dd>${Q.bet} bb (${Math.round(Q.frac*100)}%)</dd>${Q.callers?`<dt>對手 2</dt><dd>已經跟咗 ${Q.bet} bb</dd>`:""}</dl>`;
+  if(!Q.answered){
+    h+=`<div class="msg">對手 1 ${Q.frac>=.75?"落大注":"落細注"}${Q.callers?"，對手 2 跟咗。多人底池要同時贏晒兩個人":""}。諗吓佢哋 range 會收窄成點。</div>
+    <div class="slider"><label for="gIn" class="label">你估自己 equity 幾多？</label><div class="guess" id="gOut">${Q.guess}%</div>
+    <input id="gIn" type="range" min="0" max="100" value="${Q.guess}"></div>
+    <div class="row"><button class="btn primary" data-a="call">Call</button><button class="btn" data-a="fold">Fold</button></div>`;
+  }else{
+    const ok=(Q.eq>=Q.req)===(Q.ans==="call"),err=Math.abs(Q.guess-Q.eq*100),ev=Q.eq*Q.total-Q.bet;
+    h+=`<div class="verdict ${ok?"good":"bad"}"><span class="chip">${ok?"答啱":"答錯"}</span><span>正確決定：<b>${Q.eq>=Q.req?"Call":"Fold"}</b>，你揀咗 ${Q.ans==="call"?"Call":"Fold"}</span></div>
+    <dl class="kv"><dt>真實 equity</dt><dd>${pct(Q.eq)}</dd><dt>你估</dt><dd>${Q.guess}%（差 ${err.toFixed(1)}）</dd><dt>需要 equity</dt><dd>${pct(Q.req)}</dd>
+    <dt>Call 嘅 EV</dt><dd>${ev>=0?"+":""}${ev.toFixed(2)} bb</dd></dl>
+    <div class="row"><button class="btn primary" id="nextQ">下一題</button></div>`;
+  }
+  $("qPanel").innerHTML=h;renderStats();
+  const g=$("gIn");if(g)g.oninput=()=>{Q.guess=+g.value;$("gOut").textContent=g.value+"%"};
+}
+$("qPanel").addEventListener("click",e=>{
+  const a=e.target.closest("[data-a]");
+  if(a&&!Q.answered){Q.ans=a.dataset.a;Q.answered=true;stats.n++;
+    if(Q.kind==="pre"){if(Q.ans===Q.best)stats.c++}
+    else if(Q.kind==="bet"){if(Q.ans===(Q.evBet>Q.evCheck?"bet":"check"))stats.c++;stats.e+=Math.abs(Q.guess-Q.FE*100);stats.g++}
+    else{if((Q.eq>=Q.req)===(Q.ans==="call"))stats.c++;stats.e+=Math.abs(Q.guess-Q.eq*100);stats.g++}
+    saveStats();renderQuiz()}
+  if(e.target.id==="nextQ")newQuiz();
+});
+$("resetStats").onclick=()=>{stats={n:0,c:0,e:0,g:0};saveStats();renderStats()};
+
+buildPicker();loadSample();renderStats();
+</script>
+
+<script>
+if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))}
+</script>
+</body>
+</html>
