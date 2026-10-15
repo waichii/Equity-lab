@@ -26,7 +26,7 @@
   --accent:#0E6B57; --accent-soft:#D5EAE3; --accent-ink:#FFFFFF;
   --good:#1D7A3E; --good-soft:#DCF0E2; --bad:#B3261E; --bad-soft:#F7DEDB; --tie:#9AA8A2;
   --face:#FFFFFF; --face-line:#C9D2CE;
-  --spade:#1A1F1D; --heart:#C62828; --diamond:#1F5FBF; --club:#1E7B3A;
+  --spade:#1A1F1D; --heart:#C62828; --diamond:#C62828; --club:#1A1F1D;
   --cell-pair:#E4E9E7; --cell-s:#EEF2F0; --cell-o:#F6F8F7;
   --t1:#0E6B57; --t2:#6FB3A2; --t3:#C98A1B; --t4:#BFC9C5;
   --f-display:"Bricolage Grotesque","PingFang HK","Noto Sans HK",system-ui,sans-serif;
@@ -49,9 +49,32 @@
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px 40px}
-.app{max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
-header{display:flex;flex-direction:column;gap:12px}
-h1{font-family:var(--f-display);font-weight:800;font-size:28px;line-height:1.1;margin:0;letter-spacing:-.01em;text-wrap:balance}
+.app{max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:10px}
+header.top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+h1{font-family:var(--f-display);font-weight:800;font-size:21px;line-height:1.1;margin:0;letter-spacing:-.01em}
+.tabs.main{width:150px;padding:3px;gap:3px}
+.tabs.main button{padding:6px 8px;font-size:14px}
+.tabs.sub3{grid-template-columns:repeat(3,1fr)}
+.tabs.sub3 button{padding:7px}
+.dock{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);display:flex;flex-direction:column;gap:8px;padding-block:6px}
+.summary{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 12px;display:flex;flex-direction:column;gap:7px;min-height:96px;transition:opacity .15s}
+.summary.busy{opacity:.55}
+.sumtop{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.sumcards{display:flex;gap:3px;align-items:center;min-width:0}
+.mc{width:27px;height:37px;flex:none;border-radius:5px;border:1px solid var(--face-line);background:var(--face);font:700 12.5px var(--f-mono);display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1;padding:0;cursor:pointer}
+.mc small{font-size:11.5px}
+.mc.empty{background:transparent;border:1.5px dashed var(--line);color:var(--muted);font-weight:500}
+.mc-gap{width:7px;flex:none}
+.pill{font:700 12.5px var(--f-body);padding:5px 11px;border-radius:999px;white-space:nowrap}
+.pill.good{background:var(--good);color:var(--surface)}.pill.bad{background:var(--bad);color:var(--surface)}.pill.neu{background:var(--line);color:var(--ink)}
+.sumline{display:flex;align-items:center;gap:10px}
+.sumline .num{font:700 30px var(--f-mono);font-variant-numeric:tabular-nums;line-height:1}
+.sumline .bar{flex:1}
+.sumsub{font-size:12.5px;color:var(--muted);display:flex;justify-content:space-between;gap:4px 10px;flex-wrap:wrap;font-variant-numeric:tabular-nums}
+.sumsub b{color:var(--ink);font-weight:600}
+details.more{border-top:1px solid var(--line);padding-top:8px}
+details.more summary{cursor:pointer;font-weight:600;color:var(--accent);font-size:14px;padding-block:4px}
+.more-body{display:flex;flex-direction:column;gap:10px;margin-top:8px}
 .sub{margin:4px 0 0;color:var(--muted);font-size:13.5px}
 .tabs{display:grid;grid-template-columns:1fr 1fr;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:4px;gap:4px}
 .tabs button{font:600 15px var(--f-body);border:0;border-radius:9px;padding:9px;background:transparent;color:var(--muted);cursor:pointer}
@@ -101,7 +124,8 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
 
 .inputs{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .inputs label{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted)}
-.inputs input{font:500 16px var(--f-mono);padding:8px 10px;border-radius:9px;border:1px solid var(--line);background:var(--bg);color:var(--ink);width:100%;min-width:0}
+.fld{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted)}
+.fld input,.inputs input{font:500 16px var(--f-mono);padding:8px 10px;border-radius:9px;border:1px solid var(--line);background:var(--bg);color:var(--ink);width:100%;min-width:0}
 
 .grid{display:grid;grid-template-columns:repeat(13,minmax(0,1fr));gap:2px}
 .cell{aspect-ratio:1;border:0;border-radius:3px;font:600 9px var(--f-mono);padding:0;cursor:pointer;color:var(--muted);letter-spacing:-.03em;
@@ -133,24 +157,38 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
 .stat{display:flex;flex-direction:column;gap:2px}
 .stat b{font:700 20px var(--f-mono);font-variant-numeric:tabular-nums}
 .stat span{font-size:12px;color:var(--muted)}
+.tabs button{font-size:14px}
+.tbl{overflow-x:auto;margin-inline:-4px}
+.sz{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}
+.sz th{font-weight:600;color:var(--muted);text-align:right;padding:4px 5px;border-bottom:1px solid var(--line);white-space:nowrap}
+.sz td{text-align:right;padding:7px 5px;border-bottom:1px solid var(--line);font-family:var(--f-mono);white-space:nowrap}
+.sz th:first-child,.sz td:first-child{text-align:left}
+.sz td:first-child{font-family:var(--f-body)}
+.sz tr.best td{background:var(--good-soft);font-weight:700}
 footer{color:var(--muted);font-size:12.5px;text-align:center;padding-top:4px}
 @media (prefers-reduced-motion:no-preference){.bar div{transition:width .3s ease}}
 </style>
 
 <div class="app">
-  <header>
-    <div>
-      <h1>Equity 練習簿</h1>
-      <p class="sub">打完牌之後 review，同埋練習估 equity 同 pot odds</p>
-    </div>
-    <div class="tabs" role="tablist">
+  <header class="top">
+    <h1>Equity 練習簿</h1>
+    <div class="tabs main" role="tablist">
       <button id="tabCalc" role="tab" aria-selected="true">計算</button>
       <button id="tabQuiz" role="tab" aria-selected="false">練習</button>
     </div>
   </header>
 
-  <section id="calc" style="display:flex;flex-direction:column;gap:14px">
-    <div class="panel">
+  <section id="calc" style="display:flex;flex-direction:column;gap:10px">
+    <div class="dock">
+      <div class="summary" id="result" aria-live="polite"></div>
+      <div class="tabs sub3" id="subTabs" role="tablist">
+        <button data-s="cards" role="tab" aria-selected="true">牌</button>
+        <button data-s="opp" role="tab" aria-selected="false">對手</button>
+        <button data-s="bet" role="tab" aria-selected="false">注碼</button>
+      </div>
+    </div>
+
+    <div class="panel" data-sec="cards">
       <div class="label">你嘅手牌</div>
       <div class="slots" id="heroSlots"></div>
       <div class="label">公共牌 <span>Flop · Turn · River</span></div>
@@ -162,36 +200,34 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;padding-top:4px}
       </div>
     </div>
 
-    <div class="panel" id="result" aria-live="polite"></div>
-
-    <div class="panel">
-      <div class="label">對手落注，你跟唔跟？</div>
-      <div class="inputs">
-        <label for="potIn">Pot（包括對手嘅注）<input id="potIn" type="number" inputmode="decimal" min="0" step="0.01" value="1.71"></label>
-        <label for="callIn">要跟幾多<input id="callIn" type="number" inputmode="decimal" min="0" step="0.01" value="0.56"></label>
-      </div>
-    </div>
-
-    <div class="panel">
-      <div class="label">你想 bet 或者 bluff？ <span>對手 check 俾你嗰陣用</span></div>
-      <div class="inputs">
-        <label for="bpotIn">而家 pot<input id="bpotIn" type="number" inputmode="decimal" min="0" step="0.01" value="0.59"></label>
-        <label for="betIn">你想 bet 幾多<input id="betIn" type="number" inputmode="decimal" min="0" step="0.01" value="0.56"></label>
-      </div>
-      <div id="betOut" aria-live="polite" style="display:flex;flex-direction:column;gap:10px"></div>
-    </div>
-
-    <div class="panel">
+    <div class="panel" data-sec="opp" hidden>
       <div class="label">對手 range <span id="rangeInfo"></span></div>
       <div class="chips" id="oppRow"></div>
       <div class="gsteps" id="guide"></div>
       <div class="hint" id="hint"></div>
       <div id="makeup"></div>
-      <div class="hr"></div>
-      <div class="label">手動調整 <span>撳格加減手牌類別</span></div>
-      <div class="row" id="presets"></div>
-      <div class="grid" id="grid"></div>
-      <div class="msg">顏色越深，代表嗰類手牌留喺 range 嘅比例越高。各個位置嘅 range 同收窄比例都係大約估計，用嚟幫你諗，唔係 solver 結果。</div>
+      <details class="more">
+        <summary>手動調整 range</summary>
+        <div class="more-body">
+          <div class="row" id="presets"></div>
+          <div class="grid" id="grid"></div>
+          <div class="msg">撳格加減手牌類別。顏色越深，代表嗰類手牌留喺 range 嘅比例越高。各個位置嘅 range 同收窄比例都係大約估計，唔係 solver 結果。</div>
+        </div>
+      </details>
+    </div>
+
+    <div class="panel" data-sec="bet" hidden>
+      <div class="label">注碼</div>
+      <label class="fld" for="potIn">Pot（今條街有人落注之前）<input id="potIn" type="number" inputmode="decimal" min="0" step="0.01" value="0.59"></label>
+      <div class="tabs" id="modeTabs" role="tablist">
+        <button data-m="check" role="tab" aria-selected="true">未有人落注</button>
+        <button data-m="bet" role="tab" aria-selected="false">對手落注</button>
+      </div>
+      <div id="facingRow" hidden style="display:flex;flex-direction:column;gap:8px">
+        <label class="fld" for="callIn">對手落咗幾多<input id="callIn" type="number" inputmode="decimal" min="0" step="0.01"></label>
+        <div class="chips" id="sizeChips"></div>
+      </div>
+      <div id="actOut" aria-live="polite" style="display:flex;flex-direction:column;gap:10px"></div>
     </div>
   </section>
 
@@ -207,7 +243,6 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;padding-top:4px}
     <div class="row"><button class="btn" id="resetStats">重設紀錄</button></div>
   </section>
 
-  <footer>所有建議都係簡化模型：call 只按 pot odds 計，bet 只睇呢一條街。未計 implied odds 同之後幾條街嘅行動。</footer>
 </div>
 
 <script>
@@ -441,6 +476,9 @@ function scenarioName(pos,act,vs){
 const $=id=>document.getElementById(id);
 const cardHTML=c=>c==null?"":`<span class="card c${c&3}"><b>${rl(c>>2)}</b><i>${SYM[c&3]}</i></span>`;
 const pct=x=>(x*100).toFixed(1)+"%";
+const SIZES=[.33,.5,.75,1,1.5];
+const sizeName=f=>Math.round(f*100)+"%";
+const num=x=>x>=10?x.toFixed(1):x.toFixed(2);
 
 /* calc state */
 let slots=[null,null,null,null,null,null,null],active=0,timer;
@@ -473,10 +511,17 @@ $("clearBtn").onclick=()=>{slots=slots.map(()=>null);active=0;saveCur();opps.for
 const cid=(r,s)=>RANKS.indexOf(r)*4+"shdc".indexOf(s);
 function loadSample(){
   slots=[cid("Q","d"),cid("7","c"),cid("6","s"),cid("2","h"),cid("3","s"),cid("J","s"),null];active=6;
-  $("potIn").value="";$("callIn").value="";$("bpotIn").value="0.59";$("betIn").value="0.56";
+  $("potIn").value="0.59";$("callIn").value="";setFacing(false,true);
   opps=[newOpp("UTG","open")];opps[0].post={3:"check",4:"check",5:null};loadCur(0);renderSlots();schedule()}
 $("sampleBtn").onclick=loadSample;
-["potIn","callIn","bpotIn","betIn"].forEach(id=>$(id).addEventListener("input",schedule));
+["potIn","callIn"].forEach(id=>$(id).addEventListener("input",schedule));
+let facing=false;
+function setFacing(v,quiet){facing=v;document.querySelectorAll("#modeTabs button").forEach(b=>b.setAttribute("aria-selected",(b.dataset.m==="bet")===v));
+  $("facingRow").hidden=!v;if(!quiet)schedule()}
+$("modeTabs").onclick=e=>{const b=e.target.closest("[data-m]");if(b)setFacing(b.dataset.m==="bet")};
+$("sizeChips").innerHTML=SIZES.map(f=>`<button class="cb" data-f="${f}">${sizeName(f)}</button>`).join("");
+$("sizeChips").onclick=e=>{const b=e.target.closest("[data-f]");if(!b)return;const pot=parseFloat($("potIn").value)||0;
+  if(!(pot>0)){$("potIn").focus();return}$("callIn").value=(Math.round(pot*+b.dataset.f*100)/100).toString();schedule()};
 
 /* guide UI */
 function chipRow(label,g,opts,cur,dis){
@@ -563,45 +608,65 @@ function renderMakeup(combos,board){
   <div class="legend" style="margin-top:6px">${g.map((x,i)=>`<span><i class="dot k${i+1}"></i>${names[i]} <b>${(x/tot*100).toFixed(0)}%</b></span>`).join("")}</div>`;
 }
 
-function schedule(){clearTimeout(timer);saveCur();renderGuide();$("result").innerHTML='<div class="msg">計算中…</div>';timer=setTimeout(compute,40)}
+function schedule(){clearTimeout(timer);saveCur();renderGuide();$("result").classList.add("busy");timer=setTimeout(compute,40)}
+function miniCards(){
+  const mk=i=>{const c=slots[i];return c==null?`<button class="mc empty" data-mi="${i}" aria-label="${SLOT_HINT[i]}">+</button>`
+    :`<button class="mc c${c&3}" data-mi="${i}" aria-label="${rl(c>>2)}${SYM[c&3]}">${rl(c>>2)}<small>${SYM[c&3]}</small></button>`};
+  return mk(0)+mk(1)+'<span class="mc-gap"></span>'+[2,3,4,5,6].map(mk).join("")}
+function setSummary(main,pill){
+  const R=$("result");R.classList.remove("busy");
+  R.innerHTML=`<div class="sumtop"><div class="sumcards">${miniCards()}</div>${pill?`<span class="pill ${pill.cls}">${pill.text}</span>`:""}</div>${main}`}
+function showSec(name){
+  document.querySelectorAll("[data-sec]").forEach(el=>el.hidden=el.dataset.sec!==name);
+  document.querySelectorAll("#subTabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.s===name));
+  try{localStorage.setItem("eqlab-sec",name)}catch(e){}}
+$("subTabs").onclick=e=>{const b=e.target.closest("[data-s]");if(b)showSec(b.dataset.s)};
+$("result").addEventListener("click",e=>{const m=e.target.closest("[data-mi]");if(!m)return;active=+m.dataset.mi;showSec("cards");renderSlots()});
 function compute(){
-  const R=$("result"),{combos,all,lists,board,hero,dead}=buildCombos();$("betOut").innerHTML="";
+  const {combos,all,lists,board,hero,dead}=buildCombos();$("actOut").innerHTML="";
   renderGrid(all,dead);renderMakeup(combos,board);
-  if(hero.length<2){R.innerHTML='<div class="msg">揀你兩張手牌開始。</div>';return}
-  if(board.length===1||board.length===2){R.innerHTML='<div class="msg">公共牌要 0、3、4 或 5 張。</div>';return}
+  const stop=m=>{setSummary(`<div class="msg">${m}</div>`,null);$("actOut").innerHTML=`<div class="msg">${m}</div>`};
+  if(hero.length<2)return stop("撳上面嘅「+」或者喺「牌」分頁揀你兩張手牌。");
+  if(board.length===1||board.length===2)return stop("公共牌要 0、3、4 或 5 張。");
   const empty=lists.findIndex(x=>!x.length);
-  if(empty>=0){R.innerHTML=`<div class="msg">對手 ${empty+1} 嘅 range 入面冇手牌。揀返位置，或者喺格度加啲手牌。</div>`;return}
+  if(empty>=0)return stop(`對手 ${empty+1} 嘅 range 入面冇手牌，去「對手」分頁揀返位置。`);
   const multi=lists.length>1;
   const r=multi?equityMulti(hero,board,lists,30000):equity(hero,board,combos,30000),eq=multi?r.eq:(r.w+r.t/2)/r.n;
-  const pot=parseFloat($("potIn").value)||0,call=parseFloat($("callIn").value)||0;
-  let made="";if(board.length>=3)made=`<div class="made">你而家：<b>${CAT[catOf(evalHand(hero.concat(board)))]}</b></div>`;
-  let pv="";
-  if(call>0){const req=call/(pot+call),ev=eq*(pot+call)-call,ok=eq>=req;
-    pv=`<dl class="kv"><dt>需要 equity</dt><dd>${pct(req)}</dd><dt>Call 嘅 EV</dt><dd>${ev>=0?"+":""}${ev.toFixed(2)}</dd></dl>
-    <div class="verdict ${ok?"good":"bad"}"><span class="chip">${ok?"Call +EV":"Fold"}</span><span>${ok?"Equity 高過 pot odds 要求":"Equity 唔夠 pot odds 要求"}</span></div>`}
-  else pv='<div class="msg">輸入要跟嘅注碼就會計 pot odds。</div>';
-  const mw=multi?`<div class="msg">多人底池：你要同時贏晒 ${lists.length} 個對手先算贏，所以 equity 會明顯低過單挑。</div>`:"";
-  R.innerHTML=`<div class="label">你嘅 equity <span>對 ${lists.length} 個對手 · ${r.exact?"精確計算":"模擬 "+r.sims.toLocaleString()+" 次"}</span></div>
-  <div class="big"><span class="num">${pct(eq)}</span></div>
-  <div class="bar"><div class="w" style="width:${r.w/r.n*100}%"></div><div class="t" style="width:${r.t/r.n*100}%"></div><div class="l" style="width:${r.l/r.n*100}%"></div></div>
-  <div class="legend"><span>贏 <b>${pct(r.w/r.n)}</b></span><span>和 <b>${pct(r.t/r.n)}</b></span><span>輸 <b>${pct(r.l/r.n)}</b></span></div>${mw}${made}${pv}`;
-  renderBet(hero,board,lists,eq);
+  const made=board.length>=3?CAT[catOf(evalHand(hero.concat(board)))]:"Preflop";
+  const pill=renderAction(hero,board,lists,eq);
+  if(multi)$("actOut").insertAdjacentHTML("afterbegin",`<div class="msg">多人底池：你要同時贏晒 ${lists.length} 個對手先算贏，所以 equity 會明顯低過單挑。</div>`);
+  setSummary(`<div class="sumline"><span class="num">${pct(eq)}</span><div class="bar"><div class="w" style="width:${r.w/r.n*100}%"></div><div class="t" style="width:${r.t/r.n*100}%"></div><div class="l" style="width:${r.l/r.n*100}%"></div></div></div>
+  <div class="sumsub"><span>贏 <b>${pct(r.w/r.n)}</b> · 和 <b>${pct(r.t/r.n)}</b> · 輸 <b>${pct(r.l/r.n)}</b></span><span>${made} · 對 ${lists.length} 個對手 · ${r.exact?"精確":"模擬"}</span></div>`,pill);
 }
 
 function betKind(eqC,board){if(eqC==null)return"";if(eqC>=.5)return"Value bet：俾人 call 你都多數贏。";
   if(eqC>=.25&&board.length<5)return"半 bluff：俾人 call 都仲有機會中牌。";return"純 bluff：主要靠對手 fold。"}
-function renderBet(hero,board,lists,eqNow){
-  const O=$("betOut"),pot=parseFloat($("bpotIn").value)||0,bet=parseFloat($("betIn").value)||0;
-  if(board.length<3){O.innerHTML='<div class="msg">Bet 分析要有 flop 之後先用得到。</div>';return}
-  if(!(pot>0&&bet>0)){O.innerHTML='<div class="msg">輸入而家 pot 同你想 bet 幾多。</div>';return}
-  const b=betEval(hero,board,lists,opps.map(o=>o.guide),pot,bet,eqNow,20000),better=b.evBet>b.evCheck;
-  O.innerHTML=`<dl class="kv"><dt>${lists.length>1?"全部對手 fold 嘅機會":"對手 fold 嘅機會"}</dt><dd>${pct(b.FE)}</dd>
-  <dt>純 bluff 要幾多 fold 先唔蝕</dt><dd>${pct(b.be)}</dd>
-  <dt>俾人 call 之後你嘅 equity</dt><dd>${b.eqC==null?"–":pct(b.eqC)}</dd>
-  <dt>Bet 嘅 EV</dt><dd>${b.evBet>=0?"+":""}${b.evBet.toFixed(2)}</dd>
-  <dt>Check 嘅 EV（當直接攤牌）</dt><dd>+${b.evCheck.toFixed(2)}</dd></dl>
-  <div class="verdict ${better?"good":"bad"}"><span class="chip">${better?"Bet 較好":"Check 較好"}</span><span>${betKind(b.eqC,board)}</span></div>
-  <div class="msg">Fold 機會係按對手 range 入面每類牌通常點反應估出嚟。Check 嘅 EV 當你免費攤牌，未計對手之後會唔會 bet。</div>`;
+function renderAction(hero,board,lists,eqNow){
+  const O=$("actOut"),pot=parseFloat($("potIn").value)||0;
+  if(!(pot>0)){O.innerHTML='<div class="msg">輸入而家 pot 有幾大。</div>';return{cls:"neu",text:"未入 pot"}}
+  if(facing){
+    const b=parseFloat($("callIn").value)||0;
+    if(!(b>0)){O.innerHTML='<div class="msg">撳上面嘅百分比，或者入對手落咗幾多。</div>';return{cls:"neu",text:"未入注碼"}}
+    const total=pot+2*b,req=b/total,ev=eqNow*total-b,ok=eqNow>=req;
+    O.innerHTML=`<dl class="kv"><dt>對手落注</dt><dd>${num(b)}（pot 嘅 ${Math.round(b/pot*100)}%）</dd>
+    <dt>你 call 完個 pot 會有</dt><dd>${num(total)}</dd>
+    <dt>需要 equity</dt><dd>${pct(req)}</dd><dt>你嘅 equity</dt><dd>${pct(eqNow)}</dd>
+    <dt>Call 嘅 EV</dt><dd>${ev>=0?"+":""}${num(ev)}</dd></dl>
+    <div class="verdict ${ok?"good":"bad"}"><span class="chip">${ok?"Call +EV":"Fold"}</span><span>${ok?"Equity 高過 pot odds 要求":"Equity 唔夠 pot odds 要求"}</span></div>`;
+    return{cls:ok?"good":"bad",text:ok?"Call":"Fold"}}
+  if(board.length<3){O.innerHTML='<div class="msg">Bet 分析要有 flop 之後先用得到。</div>';return null}
+  const guides=opps.map(o=>o.guide),evCheck=eqNow*pot;
+  const rows=SIZES.map(f=>({f,bet:pot*f,...betEval(hero,board,lists,guides,pot,pot*f,eqNow,12000)}));
+  const best=rows.reduce((a,b)=>b.evBet>a.evBet?b:a),betBetter=best.evBet>evCheck;
+  const sg=v=>(v>=0?"+":"")+num(v);
+  O.innerHTML=`<div class="label">你想 bet 幾多？ <span>${lists.length>1?"Fold＝全部對手 fold":"Fold＝對手 fold 嘅機會"}</span></div>
+  <div class="tbl"><table class="sz"><thead><tr><th>大小</th><th>Fold</th><th>需要</th><th>被 call 後</th><th>EV</th></tr></thead><tbody>
+  ${rows.map(r=>`<tr class="${betBetter&&r===best?"best":""}"><td>${sizeName(r.f)} · ${num(r.bet)}</td><td>${pct(r.FE)}</td><td>${pct(r.be)}</td><td>${r.eqC==null?"–":pct(r.eqC)}</td><td>${sg(r.evBet)}</td></tr>`).join("")}
+  <tr class="${betBetter?"":"best"}"><td>Check</td><td>–</td><td>–</td><td>${pct(eqNow)}</td><td>${sg(evCheck)}</td></tr>
+  </tbody></table></div>
+  <div class="verdict ${betBetter?"good":"bad"}"><span class="chip">${betBetter?"Bet "+sizeName(best.f)+" 最好":"Check 較好"}</span><span>${betBetter?betKind(best.eqC,board):"每個 bet 大小嘅 EV 都低過 check。"}</span></div>
+  <div class="msg">「需要」係純 bluff 唔蝕錢所需嘅 fold 機會。Fold 機會按對手 range 入面每類牌通常點反應估出嚟；Check 嘅 EV 當你免費攤牌，未計之後幾條街。</div>`;
+  return{cls:betBetter?"good":"neu",text:betBetter?"Bet "+sizeName(best.f):"Check"};
 }
 /* tabs */
 function setTab(q){$("tabCalc").setAttribute("aria-selected",!q);$("tabQuiz").setAttribute("aria-selected",q);
@@ -736,6 +801,7 @@ $("qPanel").addEventListener("click",e=>{
 $("resetStats").onclick=()=>{stats={n:0,c:0,e:0,g:0};saveStats();renderStats()};
 
 buildPicker();loadSample();renderStats();
+try{const sec=localStorage.getItem("eqlab-sec");if(sec&&["cards","opp","bet"].includes(sec))showSec(sec)}catch(e){}
 </script>
 
 <script>
