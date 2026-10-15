@@ -29,6 +29,7 @@
   --spade:#1A1F1D; --heart:#C62828; --diamond:#C62828; --club:#1A1F1D;
   --cell-pair:#E4E9E7; --cell-s:#EEF2F0; --cell-o:#F6F8F7;
   --t1:#0E6B57; --t2:#6FB3A2; --t3:#C98A1B; --t4:#BFC9C5;
+  --warn:#8A5A00; --warn-soft:#F6EAD0;
   --f-display:"Bricolage Grotesque","PingFang HK","Noto Sans HK",system-ui,sans-serif;
   --f-body:"IBM Plex Sans","PingFang HK","Noto Sans HK","Microsoft JhengHei",system-ui,sans-serif;
   --f-mono:"JetBrains Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
@@ -38,21 +39,21 @@
   --accent:#4FC3A1; --accent-soft:#1D3A31; --accent-ink:#06211A;
   --good:#5BD38A; --good-soft:#163323; --bad:#FF7F73; --bad-soft:#3A1D1A; --tie:#5E6D67;
   --face:#F1F3F0; --face-line:#F1F3F0;
-  --cell-pair:#26302C; --cell-s:#1F2825; --cell-o:#1B2421; --t1:#4FC3A1; --t2:#2E7D69; --t3:#E0A43A; --t4:#3D4A45; color-scheme:dark}}
+  --cell-pair:#26302C; --cell-s:#1F2825; --cell-o:#1B2421; --t1:#4FC3A1; --t2:#2E7D69; --t3:#E0A43A; --t4:#3D4A45; --warn:#E8B45A; --warn-soft:#3A2E17; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#0F1513; --surface:#18201D; --ink:#E3EBE7; --muted:#93A39C; --line:#2B3632;
   --accent:#4FC3A1; --accent-soft:#1D3A31; --accent-ink:#06211A;
   --good:#5BD38A; --good-soft:#163323; --bad:#FF7F73; --bad-soft:#3A1D1A; --tie:#5E6D67;
   --face:#F1F3F0; --face-line:#F1F3F0;
-  --cell-pair:#26302C; --cell-s:#1F2825; --cell-o:#1B2421; --t1:#4FC3A1; --t2:#2E7D69; --t3:#E0A43A; --t4:#3D4A45; color-scheme:dark}
+  --cell-pair:#26302C; --cell-s:#1F2825; --cell-o:#1B2421; --t1:#4FC3A1; --t2:#2E7D69; --t3:#E0A43A; --t4:#3D4A45; --warn:#E8B45A; --warn-soft:#3A2E17; color-scheme:dark}
 
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px 40px}
 .app{max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:10px}
 header.top{display:flex;align-items:center;justify-content:space-between;gap:10px}
-h1{font-family:var(--f-display);font-weight:800;font-size:21px;line-height:1.1;margin:0;letter-spacing:-.01em}
-.tabs.main{width:150px;padding:3px;gap:3px}
+h1{font-family:var(--f-display);font-weight:800;font-size:19px;line-height:1.1;margin:0;letter-spacing:-.01em;white-space:nowrap}
+.tabs.main{width:min(200px,56vw);padding:3px;gap:3px;grid-template-columns:repeat(3,1fr)}
 .tabs.main button{padding:6px 8px;font-size:14px}
 .tabs.sub3{grid-template-columns:repeat(3,1fr)}
 .tabs.sub3 button{padding:7px}
@@ -72,6 +73,41 @@ h1{font-family:var(--f-display);font-weight:800;font-size:21px;line-height:1.1;m
 .sumline .bar{flex:1}
 .sumsub{font-size:12.5px;color:var(--muted);display:flex;justify-content:space-between;gap:4px 10px;flex-wrap:wrap;font-variant-numeric:tabular-nums}
 .sumsub b{color:var(--ink);font-weight:600}
+details.panel{display:block}
+details.imp>summary{cursor:pointer;list-style:none;font-size:13px}
+details.imp>summary::-webkit-details-marker{display:none}
+#hhText{width:100%;font:13px var(--f-mono);padding:8px;border-radius:9px;border:1px solid var(--line);background:var(--bg);color:var(--ink);resize:vertical}
+.stats6{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px 8px;margin-bottom:10px}
+.stats6 .stat b{font-size:17px}
+.stat small{font-size:11px;color:var(--muted)}
+.pos{color:var(--good)}.neg{color:var(--bad)}
+.leaks{display:flex;flex-direction:column;gap:6px}
+.leak{display:flex;justify-content:space-between;align-items:center;gap:10px;text-align:left;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:10px;padding:9px 11px;cursor:pointer;font:inherit}
+.leak>span:first-child{display:flex;flex-direction:column;gap:2px;min-width:0}
+.leak small{color:var(--muted);font-size:12.5px}
+.leak .lv{font:600 12.5px var(--f-mono);text-align:right}
+.hlist{display:flex;flex-direction:column}
+.hrow{border-top:1px solid var(--line)}
+.hhead{width:100%;display:flex;align-items:center;gap:10px;background:transparent;border:0;color:var(--ink);padding:9px 2px;cursor:pointer;text-align:left;font:inherit}
+.hcards{display:flex;gap:2px;flex:none}
+.hcards .mc,.sthead .mc,.msg .mc{cursor:default;display:inline-flex}
+.hmeta{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.hmeta b{font-size:13.5px;font-weight:600}
+.tags{display:flex;flex-wrap:wrap;gap:4px}
+.tag{font:600 11px var(--f-body);font-style:normal;padding:2px 7px;border-radius:999px;background:var(--line);color:var(--ink)}
+.tag.bad{background:var(--bad-soft);color:var(--bad)}.tag.good{background:var(--good-soft);color:var(--good)}.tag.warn{background:var(--warn-soft);color:var(--warn)}
+.hnet{font:700 14px var(--f-mono);white-space:nowrap}
+.hdet{padding:2px 0 14px;display:flex;flex-direction:column;gap:12px}
+.street{display:flex;flex-direction:column;gap:5px}
+.sthead{display:flex;align-items:center;gap:3px;flex-wrap:wrap}
+.sthead b{margin-right:6px;font-size:13.5px}
+.sthead>span{margin-left:6px;font-size:12.5px;color:var(--muted);font-family:var(--f-mono)}
+.sizing{font-size:12.5px;color:var(--ink);margin-top:3px;line-height:1.5}
+.cb.open{margin-left:auto;padding:4px 10px;font-size:12px}
+.alog{margin:0;padding-left:20px;font-size:13.5px;display:flex;flex-direction:column;gap:3px;color:var(--muted)}
+.alog li.me{color:var(--ink)}
+.note{font-size:12px;padding:1px 6px;border-radius:6px;background:var(--cell-s);color:var(--ink);display:inline-block;margin-top:2px}
+.note.ok{background:var(--good-soft);color:var(--good)}.note.no{background:var(--bad-soft);color:var(--bad)}
 details.more{border-top:1px solid var(--line);padding-top:8px}
 details.more summary{cursor:pointer;font-weight:600;color:var(--accent);font-size:14px;padding-block:4px}
 .more-body{display:flex;flex-direction:column;gap:10px;margin-top:8px}
@@ -175,6 +211,7 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;padding-top:4px}
     <div class="tabs main" role="tablist">
       <button id="tabCalc" role="tab" aria-selected="true">計算</button>
       <button id="tabQuiz" role="tab" aria-selected="false">練習</button>
+      <button id="tabHH" role="tab" aria-selected="false">紀錄</button>
     </div>
   </header>
 
@@ -228,6 +265,23 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;padding-top:4px}
         <div class="chips" id="sizeChips"></div>
       </div>
       <div id="actOut" aria-live="polite" style="display:flex;flex-direction:column;gap:10px"></div>
+    </div>
+  </section>
+
+  <section id="hh" hidden style="flex-direction:column;gap:10px">
+    <details class="panel imp" id="hhImport" open>
+      <summary class="label">匯入手牌紀錄 <span>只喺你部機度處理</span></summary>
+      <div class="more-body">
+        <div class="row"><label class="btn primary" for="hhFile">揀檔案（.txt）</label><input type="file" id="hhFile" accept=".txt,text/plain" hidden></div>
+        <textarea id="hhText" rows="5" placeholder="或者將 CoinPoker 匯出嘅手牌紀錄貼喺度"></textarea>
+        <div class="row"><button class="btn" id="hhGo">分析貼上嘅紀錄</button><button class="btn" id="hhClear">清除紀錄</button></div>
+      </div>
+    </details>
+    <div class="msg" id="hhMsg"></div>
+    <div id="hhResults" hidden style="display:flex;flex-direction:column;gap:10px">
+      <div class="panel" id="hhSummary"></div>
+      <div class="panel"><div class="label">主要問題 <span>撳入去睇相關手牌</span></div><div id="hhLeaks" class="leaks"></div></div>
+      <div class="panel"><div class="label">手牌 <span id="hhCount"></span></div><div class="chips" id="hhFilters"></div><div id="hhList" class="hlist"></div></div>
     </div>
   </section>
 
@@ -342,7 +396,11 @@ function tierOf(h,board){
   const v=evalHand([h[0],h[1],...board]),cat=catOf(v),bcat=catOf(evalHand(board));
   const top=Math.max(...board.map(c=>c>>2)),r1=h[0]>>2,r2=h[1]>>2;
   if(cat>bcat){
-    if(cat>=3)return"M";if(cat===2)return"S";
+    if(cat>=3)return"M";
+    if(cat===2){const br=board.map(c=>c>>2);
+      if(bcat===1&&r1!==r2&&!(br.includes(r1)&&br.includes(r2))){const r=br.includes(r1)?r1:r2;return r===top?"S":"Md"}
+      if(bcat===1&&r1===r2)return r1>top?"S":"Md";
+      return"S"}
     if(r1===r2)return r1>top?"S":"Md";
     if(r1===top||r2===top)return"S";return"Md";
   }
@@ -669,9 +727,12 @@ function renderAction(hero,board,lists,eqNow){
   return{cls:betBetter?"good":"neu",text:betBetter?"Bet "+sizeName(best.f):"Check"};
 }
 /* tabs */
-function setTab(q){$("tabCalc").setAttribute("aria-selected",!q);$("tabQuiz").setAttribute("aria-selected",q);
-  $("calc").hidden=q;$("calc").style.display=q?"none":"flex";$("quiz").hidden=!q;$("quiz").style.display=q?"flex":"none";if(q&&!Q)newQuiz()}
-$("tabCalc").onclick=()=>setTab(false);$("tabQuiz").onclick=()=>setTab(true);
+function setMain(name){
+  for(const [t,sec] of [["tabCalc","calc"],["tabQuiz","quiz"],["tabHH","hh"]]){const on=sec===name;
+    $(t).setAttribute("aria-selected",on);$(sec).hidden=!on;$(sec).style.display=on?"flex":"none"}
+  if(name==="quiz"&&!Q)newQuiz()}
+const setTab=q=>setMain(q?"quiz":"calc");
+$("tabCalc").onclick=()=>setMain("calc");$("tabQuiz").onclick=()=>setMain("quiz");$("tabHH").onclick=()=>setMain("hh");
 
 /* quiz */
 let Q=null,stats={n:0,c:0,e:0,g:0};
@@ -800,7 +861,345 @@ $("qPanel").addEventListener("click",e=>{
 });
 $("resetStats").onclick=()=>{stats={n:0,c:0,e:0,g:0};saveStats();renderStats()};
 
+/* ===== hand history: parse + analyse (pure, no DOM) ===== */
+const HH_SEC=["Preflop","Flop","Turn","River"];
+function hhCard(s){return RANKS.indexOf(s[0])*4+"shdc".indexOf(s[1])}
+function hhMoney(s){const m=String(s).match(/[\d.]+/);return m?parseFloat(m[0]):0}
+function classKey(a,b){const r1=a>>2,r2=b>>2,hi=Math.max(r1,r2),lo=Math.min(r1,r2);
+  if(hi===lo)return RANKS[hi]+RANKS[lo];return RANKS[hi]+RANKS[lo]+((a&3)===(b&3)?"s":"o")}
+function seatPositions(seats,button){
+  const occ=seats.map(s=>s.seat).sort((a,b)=>a-b),n=occ.length,pos={};
+  if(n<2)return pos;
+  let k=occ.findIndex(s=>s>button);if(k<0)k=0;
+  const order=[...occ.slice(k),...occ.slice(0,k)];/* first = SB */
+  const name=s=>seats.find(x=>x.seat===s).name;
+  if(n===2){pos[name(button)]="BTN";pos[name(order.find(s=>s!==button))]="BB";return pos}
+  pos[name(order[0])]="SB";pos[name(order[1])]="BB";
+  const rest=order.slice(2),labels=["UTG","MP","CO","BTN"].slice(-rest.length);
+  if(rest.length>4){rest.forEach((s,i)=>pos[name(s)]=i<rest.length-3?"UTG":["MP","CO","BTN"][i-(rest.length-3)])}
+  else rest.forEach((s,i)=>pos[name(s)]=labels[i]);
+  return pos}
+
+function parseHand(text){
+  const lines=text.split("\n");
+  const m=lines[0].match(/Hand #(\d+):\s*(.*?)\s*\(₮([\d.]+)\/₮([\d.]+)(?:\/₮([\d.]+))?\)\s+(\d{4})\/(\d\d)\/(\d\d) (\d\d:\d\d)/);
+  if(!m)return null;
+  const H={id:m[1],bomb:/bomb/i.test(m[2]),sb:+m[3],bb:+m[4],date:`${m[7]}/${m[8]}`,time:m[9],seats:[],actions:[],board:[],
+    streetPot:[0,0,0,0],shows:{},collected:{},hero:null,raw:text};
+  const bm=text.match(/Seat #(\d+) is the button/);const button=bm?+bm[1]:0;
+  for(const L of lines){const s=L.match(/^Seat (\d+): (\S+) \(₮([\d.]+) in chips\)/);if(s)H.seats.push({seat:+s[1],name:s[2],stack:+s[3]})}
+  const hc=text.match(/Dealt to Hero \[(\w\w) (\w\w)\]/);if(!hc)return null;
+  H.hero=[hhCard(hc[1]),hhCard(hc[2])];
+  H.pos=seatPositions(H.seats,button);
+  let street=0,cur={},dead=0,total={},returned={},folded=new Set(),allin=new Set(),inShowdown=false;
+  const potNow=()=>dead+Object.values(total).reduce((a,b)=>a+b,0)+Object.values(cur).reduce((a,b)=>a+b,0);
+  const endStreet=()=>{for(const k in cur)total[k]=(total[k]||0)+cur[k];cur={}};
+  for(const L of lines){
+    const st=L.match(/^\*\*\* (FIRST |SECOND )?(FLOP|TURN|RIVER) \*\*\* (.*)$/);
+    if(st){const ns={FLOP:1,TURN:2,RIVER:3}[st[2]];
+      if(ns!==street){endStreet();street=ns;H.streetPot[ns]=potNow()}
+      if(st[1]!=="SECOND "){H.board=[...st[3].matchAll(/\b([2-9TJQKA][shdc])\b/g)].map(x=>hhCard(x[1]))}
+      continue}
+    if(/^\*\*\* (FIRST |SECOND )?SHOWDOWN/.test(L)){inShowdown=true;continue}
+    if(/^\*\*\* SUMMARY/.test(L))break;
+    const a=L.match(/^(\S+): (posts ante|posts small blind|posts big blind|posts auto big blind|posts [a-z ]+|calls|bets|raises|ALLIN|RETURN|checks|folds|shows|mucks hand)\s*(.*)$/);
+    if(a&&!inShowdown){
+      const [,who,verb,rest]=a;
+      const maxCur=Math.max(0,...Object.values(cur)),mine=cur[who]||0,toCall=Math.max(0,maxCur-mine),potBefore=potNow();
+      let amt=0,kind=verb;
+      if(verb==="posts ante"){dead+=hhMoney(rest);continue}
+      if(verb.startsWith("posts")){cur[who]=mine+hhMoney(rest);continue}
+      if(verb==="calls"||verb==="bets"){amt=hhMoney(rest);cur[who]=mine+amt}
+      else if(verb==="raises"){const to=hhMoney(rest.split(" to ")[1]);amt=to-mine;cur[who]=to}
+      else if(verb==="ALLIN"){amt=hhMoney(rest);cur[who]=mine+amt;allin.add(who);
+        kind=mine+amt<=maxCur+1e-9?"calls":(maxCur>0?"raises":"bets")}
+      else if(verb==="RETURN"){returned[who]=(returned[who]||0)+hhMoney(rest);cur[who]=mine-hhMoney(rest);continue}
+      else if(verb==="folds")folded.add(who);
+      H.actions.push({street,who,verb,kind,amt,toCall,potBefore,board:H.board.slice(),allin:verb==="ALLIN",to:cur[who]});
+    }
+    const sh=L.match(/^(\S+): shows \[(\w\w) (\w\w)\]/);if(sh)H.shows[sh[1]]=[hhCard(sh[2]),hhCard(sh[3])];
+    const c=L.match(/^(\S+) collected ₮([\d.]+)/);if(c)H.collected[c[1]]=(H.collected[c[1]]||0)+ +c[2];
+  }
+  endStreet();
+  const fb=text.match(/(?:FIRST )?Board \[([^\]]+)\]/);if(fb)H.finalBoard=fb[1].trim().split(/\s+/).map(hhCard);else H.finalBoard=H.board;
+  H.inv=(total.Hero||0);
+  const ante=(text.match(/^Hero: posts ante ₮([\d.]+)/m)||[,0])[1];H.inv+= +ante;
+  H.net=(H.collected.Hero||0)-H.inv;H.potNet=Object.values(H.collected).reduce((a,b)=>a+b,0);
+  H.folded=folded;H.allinSet=allin;
+  return H}
+
+function parseHistory(text){
+  return text.split(/\n(?=[^\n]*Hand #\d+:)/).map(parseHand).filter(Boolean)}
+
+/* --- per-hand analysis --- */
+const PREMIUM=parseRange("TT+,AQs+,AKo");
+function analyseHand(H){
+  const A={tags:[],notes:[],flags:[],decisions:[]};
+  const key=classKey(H.hero[0],H.hero[1]),hp=H.pos.Hero||"?";A.key=key;A.pos=hp;
+  const pre=H.actions.filter(a=>a.street===0);
+  /* preflop */
+  if(!H.bomb){
+    const i=pre.findIndex(a=>a.who==="Hero");
+    if(i>=0){
+      const before=pre.slice(0,i),hero=pre[i];
+      const raises=before.filter(a=>a.kind==="raises"||(a.kind==="bets"));
+      const limpers=before.filter(a=>a.kind==="calls");
+      const act=hero.kind==="raises"||hero.kind==="bets"?"raise":hero.kind==="calls"?"call":hero.verb==="checks"?"check":"fold";
+      A.vpip=act==="raise"||act==="call";A.pfr=act==="raise";
+      if(act==="raise"&&!hero.allin){
+        if(!raises.length){const bbs=hero.to/H.bb,tgt=(hp==="SB"?3:2.5)+limpers.length;
+          const ok=bbs>=2&&bbs<=tgt+1.5;A.sizeNotes=[`Preflop 注碼：你 raise 到 ${bbs.toFixed(1)}bb，一般大約 ${tgt}bb${limpers.length?`（每多一個 limp 加 1bb）`:""}。${ok?"大小合理。":bbs<2?"太細，對手好平就可以入池。":"偏大，冒險多但對手只會用好牌跟。"}`];
+          if(!ok){A.flags.push("preSize");A.tags.push(["Open 注碼","warn"])}}
+        else if(raises.length===1){const mult=hero.to/raises[0].to,ip=!["SB","BB"].includes(hp),tgt=ip?3:4;
+          const ok=mult>=2.5&&mult<=5.5;A.sizeNotes=[`Preflop 注碼：你 3-bet 到對手注碼嘅 ${mult.toFixed(1)} 倍，${ip?"有位置":"冇位置"}一般大約 ${tgt} 倍。${ok?"大小合理。":mult<2.5?"太細，對手好容易 call。":"偏大。"}`];
+          if(!ok){A.flags.push("preSize");A.tags.push(["3-bet 注碼","warn"])}}}
+      if(!raises.length){
+        if(act==="call"&&hp!=="BB"){A.limp=true;A.tags.push(["Limp","warn"]);
+          if(PREMIUM.has(key)){A.tags.push(["大牌 limp","bad"]);A.flags.push("bigLimp")}}
+        if(!limpers.length&&hp!=="BB"&&OPEN[hp]&&act!=="check"){
+          const ref=preAction(hp,null,key);A.preRef={ctx:`全部 fold 到你（${hp}）`,ref,act};
+          const name={raise:"Raise",fold:"Fold",call:"Limp",check:"Check"};
+          if(!(ref===act)){A.flags.push("preDiff");
+            A.notes.push(`Preflop：全部 fold 到你喺 ${hp}，參考表係 <b>${name[ref]}</b>，你揀咗 ${name[act]}。${act==="call"?"第一個入池 limp 唔好，一係 raise 一係 fold。":""}`)}
+          else A.notes.push(`Preflop：全部 fold 到你喺 ${hp}，你 ${name[act]}，同參考表一致。`)}
+        else if(limpers.length&&act==="call"&&hp!=="BB")A.notes.push(`Preflop：前面有人 limp，你跟住 limp。有好牌應該加注孤立佢哋，弱牌就 fold。`);
+      }else if(raises.length===1){
+        const vsPos=H.pos[raises[0].who];
+        if(raises[0].who!=="Hero"&&vsOptions(hp).includes(vsPos)){
+          const ref=preAction(hp,vsPos,key),mine=act==="raise"?"3bet":act==="call"?"call":"fold";
+          if(act==="raise")A.threebet=true;
+          const name={"3bet":"3-bet",call:"Call",fold:"Fold"};
+          A.preRef={ctx:`${vsPos} open，你喺 ${hp}`,ref,act:mine};
+          if(ref!==mine){A.flags.push("preDiff");A.notes.push(`Preflop：${vsPos} open，你喺 ${hp}，參考表係 <b>${name[ref]}</b>，你揀咗 ${name[mine]}。`)}
+          else A.notes.push(`Preflop：${vsPos} open，你 ${name[mine]}，同參考表一致。`)}
+      }else A.notes.push(`Preflop：你出聲之前已經有人 3-bet，呢度冇參考表比較。`);
+    }
+  }else A.tags.push(["Bomb pot",""]);
+  /* postflop decisions */
+  const villainsShown=Object.keys(H.shows).filter(n=>n!=="Hero");
+  for(const a of H.actions){
+    if(a.who!=="Hero"||a.street===0)continue;
+    const d={street:a.street,kind:a.kind,verb:a.verb,amt:a.amt,toCall:a.toCall,potBefore:a.potBefore,board:a.board,allin:a.allin};
+    if(a.toCall>0){d.req=a.toCall/(a.potBefore+a.toCall);d.betRatio=a.toCall/Math.max(.01,a.potBefore-a.toCall)}
+    d.tier=tierOf(H.hero,a.board);
+    if(a.street===3&&a.toCall>0&&(a.kind==="calls")&&d.betRatio>=.5&&["Md","O","A","G","D"].includes(d.tier)){
+      d.flag="riverWeakCall";A.flags.push("riverWeakCall");A.tags.push(["River 弱牌 call 大注","bad"])}
+    if(a.kind==="bets"){d.size=a.amt/Math.max(.01,a.potBefore);A.sizes=A.sizes||[];A.sizes.push({tier:d.tier,size:d.size,street:a.street});
+      if(["M","S"].includes(d.tier)&&a.street>=2&&d.size<.4&&!a.allin){A.flags.push("valueSmall");A.tags.push(["強牌注碼細","warn"])}
+      if(d.tier==="Md"&&a.street===3&&d.size>=.9){A.flags.push("mediumBig");A.tags.push(["中等牌落大注","warn"])}}
+    if(a.kind==="raises"&&!a.allin){const prev=(a.to-a.amt)+a.toCall;d.raiseMult=a.to/Math.max(.01,prev);
+      if(d.raiseMult<2.5){A.flags.push("minRaise");A.tags.push(["Raise 太細","warn"])}}
+    A.decisions.push(d)}
+  /* all-in EV */
+  const alls=H.actions.filter(a=>a.allin);
+  const sdOpp=villainsShown.map(n=>H.shows[n]);
+  if(alls.length&&H.shows.Hero&&sdOpp.length&&!H.folded.has("Hero")){
+    const st=alls[alls.length-1].street,nb=[0,3,4,5][st],bAt=H.finalBoard.slice(0,nb);
+    let eq;if(sdOpp.length===1){const r=equity(H.hero,bAt,[[...sdOpp[0],1]],20000);eq=(r.w+r.t/2)/r.n}
+    else eq=equityMulti(H.hero,bAt,sdOpp.map(o=>[[...o,1]]),20000).eq;
+    const ev=eq*H.potNet-H.inv;A.allin={street:st,eq,ev,luck:H.net-ev,board:bAt,opp:sdOpp};
+    A.tags.push(["All-in",""]);
+    if(st<3&&eq>=.6&&H.net<0){A.tags.push(["Bad beat","bad"]);A.flags.push("badBeat")}
+    if(st<3&&eq<=.4&&H.net>0)A.tags.push(["追中咗","good"]);
+    if(st<3&&eq<.4){A.flags.push("allinBehind");A.tags.push(["入錢時落後","warn"])}
+  }
+  A.showdown=!!H.shows.Hero;A.sawFlop=H.actions.some(a=>a.street>=1&&a.who==="Hero")||(!!H.shows.Hero&&!H.folded.has("Hero"));
+  return A}
+
+function summarise(list){
+  const S={hands:list.length,net:0,bb100:0,vpip:0,pfr:0,limp:0,bigLimp:0,threebet:0,sawFlop:0,sd:0,wsd:0,nonBomb:0,
+    allins:0,allEV:0,allNet:0,sz:{strong:{n:0,sum:0,all:[]},medium:{n:0,sum:0,all:[]},weak:{n:0,sum:0,all:[]}},riverWeak:0,riverWeakNet:0,preDiff:0,badBeat:0,badBeatLuck:0};
+  let bbSum=0;
+  for(const {H,A} of list){
+    S.net+=H.net;bbSum+=H.net/H.bb;
+    if(!H.bomb){S.nonBomb++;if(A.vpip)S.vpip++;if(A.pfr)S.pfr++}
+    if(A.limp)S.limp++;if(A.flags.includes("bigLimp"))S.bigLimp++;if(A.threebet)S.threebet++;
+    if(A.sawFlop)S.sawFlop++;if(A.showdown){S.sd++;if(H.net>0)S.wsd++}
+    if(A.allin){S.allins++;S.allEV+=A.allin.ev;S.allNet+=H.net}
+    if(A.flags.includes("riverWeakCall")){S.riverWeak++;S.riverWeakNet+=H.net}
+    if(A.flags.includes("preDiff"))S.preDiff++;
+    for(const f of ["valueSmall","mediumBig","minRaise","preSize"])if(A.flags.includes(f))S[f]=(S[f]||0)+1;
+    for(const z of A.sizes||[]){const g={M:"strong",S:"strong",Md:"medium"}[z.tier]||"weak";S.sz[g].n++;S.sz[g].sum+=z.size;S.sz[g].all.push(z.size)}
+    if(A.flags.includes("badBeat")){S.badBeat++;S.badBeatLuck+=A.allin.luck}
+  }
+  S.bb100=list.length?bbSum/list.length*100:0;return S}
+
+/* ===== hand history: UI ===== */
+let HH=[],hhFilter="all";
+const sgn=(v,d=2)=>(v>=0?"+":"−")+"₮"+Math.abs(v).toFixed(d);
+const miniCard=c=>`<span class="mc c${c&3}">${rl(c>>2)}<small>${SYM[c&3]}</small></span>`;
+const TIER_NAME={M:"怪獸牌",S:"強牌",Md:"中等牌",D:"Draw",G:"弱 draw",O:"高張",A:"冇嘢"};
+const VERB_NAME={calls:"call",bets:"bet",raises:"raise",checks:"check",folds:"fold"};
+function hhLoad(text,save){
+  const hs=parseHistory(text);
+  if(!hs.length){$("hhMsg").textContent="搵唔到手牌。請確認係 CoinPoker 匯出嘅手牌紀錄文字。";return}
+  HH=hs.map(H=>({H,A:analyseHand(H)}));
+  if(save){try{localStorage.setItem("eqlab-hh",text)}catch(e){}}
+  $("hhMsg").textContent=`已經讀入 ${HH.length} 手。資料只喺你部機度處理。`;
+  $("hhImport").open=false;hhFilter="all";hhRender();
+}
+function hhRender(){
+  const S=summarise(HH),R=$("hhResults");R.hidden=!HH.length;if(!HH.length)return;
+  const pctOf=(a,b)=>b?Math.round(a/b*100)+"%":"–";
+  const luck=S.allNet-S.allEV;
+  $("hhSummary").innerHTML=`<div class="stats6">
+    <div class="stat"><b>${S.hands}</b><span>手數</span></div>
+    <div class="stat"><b class="${S.net>=0?"pos":"neg"}">${sgn(S.net)}</b><span>淨輸贏</span></div>
+    <div class="stat"><b>${S.bb100>=0?"+":""}${S.bb100.toFixed(0)}</b><span>bb／100 手</span></div>
+    <div class="stat"><b>${pctOf(S.vpip,S.nonBomb)}</b><span>入池率 VPIP<br><small>參考 22–28%</small></span></div>
+    <div class="stat"><b>${pctOf(S.pfr,S.nonBomb)}</b><span>加注率 PFR<br><small>參考 18–22%</small></span></div>
+    <div class="stat"><b>${pctOf(S.wsd,S.sd)}</b><span>攤牌贏率<br><small>${S.sd} 次攤牌</small></span></div>
+  </div>
+  ${S.allins?`<div class="hint"><p><b>All-in（${S.allins} 手）</b>：實際 ${sgn(S.allNet)}，按入錢時 equity 應得 ${sgn(S.allEV)}。${Math.abs(luck)<1?"同預期差唔多。":luck<0?`即係運氣差咗 ${sgn(luck).replace("−","")}。`:`即係運氣好咗 ${sgn(luck)}。`}</p>
+  <p>扣除 all-in 運氣，成段時間大約係 ${sgn(S.net-luck)}。</p></div>`:""}
+  ${sizingSummary(S)}`;
+  const leaks=[];
+  if(S.limp)leaks.push(["limp",`第一個入池 limp`,`${S.limp} 次${S.bigLimp?`，其中 ${S.bigLimp} 次係大牌`:""}`,"一係 raise，一係 fold。大牌 limp 會贏少好多。"]);
+  if(S.preDiff)leaks.push(["pre",`Preflop 同參考表唔同`,`${S.preDiff} 次`,"撳入去逐手睇參考表會點做。"]);
+  if(S.riverWeak)leaks.push(["river",`River 用弱牌 call 大注`,`${S.riverWeak} 次，${sgn(S.riverWeakNet)}`,"微注枱 river 落大注多數係真牌。"]);
+  if(S.valueSmall)leaks.push(["valueSmall","強牌喺 turn／river 落注太細",`${S.valueSmall} 次`,"少過 40% pot，贏少咗。"]);
+  if(S.mediumBig)leaks.push(["mediumBig","中等牌喺 river 落大注",`${S.mediumBig} 次`,"差過你嘅牌會 fold，好過你嘅先會 call。"]);
+  if(S.minRaise)leaks.push(["minRaise","Postflop raise 太細",`${S.minRaise} 次`,"Raise 少過對手注碼 2.5 倍，對手好平就跟到。"]);
+  if(S.preSize)leaks.push(["preSize","Preflop 注碼唔標準",`${S.preSize} 次`,"Open 大約 2.5bb，3-bet 大約 3–4 倍。"]);
+  if(S.badBeat)leaks.push(["beat",`領先入錢但輸咗`,`${S.badBeat} 次，運氣少咗 ${sgn(S.badBeatLuck).replace("−","₮").replace("₮₮","₮")}`,"呢啲係運氣，唔使改打法。"]);
+  if(S.pfr/Math.max(1,S.nonBomb)<.1)leaks.push(["pfr",`加注太少`,`PFR 只有 ${pctOf(S.pfr,S.nonBomb)}`,"好牌要主動 raise，先可以贏大 pot。"]);
+  $("hhLeaks").innerHTML=leaks.length?leaks.map(([k,t,v,tip])=>`<button class="leak" data-f="${k}"><span><b>${t}</b><small>${tip}</small></span><span class="lv">${v}</span></button>`).join(""):'<div class="msg">冇發現明顯問題。</div>';
+  const F=[["all","全部"],["flag","有問題"],["allin","All-in"],["lose","輸最多"],["win","贏最多"]];
+  $("hhFilters").innerHTML=F.map(([k,n])=>`<button class="cb" data-f="${k}" aria-pressed="${hhFilter===k}">${n}</button>`).join("");
+  hhList();
+}
+function sizingSummary(S){
+  const g=S.sz,tot=g.strong.n+g.medium.n+g.weak.n;if(!tot)return"";
+  const med=x=>{if(!x.n)return 0;const v=[...x.all].sort((a,b)=>a-b),m=v.length>>1;return v.length%2?v[m]:(v[m-1]+v[m])/2};
+  const av=x=>x.n?Math.round(med(x)*100)+"%":"–";
+  const row=(n,x,ref)=>`<tr><td>${n}</td><td>${x.n}</td><td>${av(x)}</td><td>${ref}</td></tr>`;
+  const st=med(g.strong),wk=med(g.weak);
+  let tip="";
+  if(g.strong.n&&g.weak.n&&Math.abs(st-wk)>.2)tip=st<wk?"你強牌反而落得細過弱牌。對手只要睇注碼大細，就估到你有冇嘢。":"你強牌落大注、弱牌落細注，相差太大，對手睇注碼就估到你有冇嘢。";
+  else if(g.strong.n&&st<.45)tip="你有強牌嗰陣落注偏細，贏少咗。微注枱對手好鍾意 call，強牌可以落大啲。";
+  return `<div class="label" style="margin-top:12px">注碼習慣 <span>Flop 之後主動落注，pot 嘅 %</span></div>
+  <div class="tbl"><table class="sz"><thead><tr><th>牌力</th><th>次數</th><th>通常落</th><th>參考</th></tr></thead><tbody>
+  ${row("強牌",g.strong,"50–100%")}${row("中等牌",g.medium,"細注／check")}${row("Draw／冇嘢",g.weak,"同強牌相近")}
+  </tbody></table></div>${tip?`<div class="msg" style="margin-top:6px">${tip}</div>`:""}`}
+function hhPick(){
+  let L=HH.map((x,i)=>({...x,i}));
+  if(hhFilter==="flag")L=L.filter(x=>x.A.flags.length);
+  else if(hhFilter==="allin")L=L.filter(x=>x.A.allin);
+  else if(hhFilter==="lose")L=L.filter(x=>x.H.net<0).sort((a,b)=>a.H.net-b.H.net).slice(0,30);
+  else if(hhFilter==="win")L=L.filter(x=>x.H.net>0).sort((a,b)=>b.H.net-a.H.net).slice(0,30);
+  else if(hhFilter==="limp")L=L.filter(x=>x.A.limp);
+  else if(hhFilter==="pre")L=L.filter(x=>x.A.flags.includes("preDiff"));
+  else if(hhFilter==="river")L=L.filter(x=>x.A.flags.includes("riverWeakCall"));
+  else if(hhFilter==="beat")L=L.filter(x=>x.A.flags.includes("badBeat"));
+  else if(hhFilter==="pfr")L=L.filter(x=>x.A.vpip&&!x.A.pfr);
+  else if(["valueSmall","mediumBig","minRaise","preSize"].includes(hhFilter))L=L.filter(x=>x.A.flags.includes(hhFilter));
+  return L}
+function hhList(){
+  const L=hhPick();
+  $("hhCount").textContent=`${L.length} 手`;
+  $("hhList").innerHTML=L.length?L.map(({H,A,i})=>`<div class="hrow" data-h="${i}">
+    <button class="hhead" aria-expanded="false"><span class="hcards">${H.hero.map(miniCard).join("")}</span>
+    <span class="hmeta"><b>${H.date} ${H.time} · ${A.pos}</b><span class="tags">${A.tags.map(([t,c])=>`<i class="tag ${c}">${t}</i>`).join("")}</span></span>
+    <span class="hnet ${H.net>0?"pos":H.net<0?"neg":""}">${Math.abs(H.net)<.005?"0":sgn(H.net)}</span></button>
+    <div class="hdet" hidden></div></div>`).join(""):'<div class="msg">呢個分類冇手牌。</div>';
+}
+function hhDetail(i){
+  const {H,A}=HH[i],name=n=>n==="Hero"?"<b>你</b>":(H.pos[n]||n.slice(0,6));
+  let h="";
+  const notes=[...A.notes,...(A.sizeNotes||[])];
+  if(notes.length)h+=`<div class="hint">${notes.map(n=>`<p>${n}</p>`).join("")}</div>`;
+  const villains=Object.keys(H.shows).filter(n=>n!=="Hero");
+  for(let st=0;st<4;st++){
+    const acts=H.actions.filter(a=>a.street===st);if(!acts.length)continue;
+    const bd=st?H.actions.find(a=>a.street===st).board:[];
+    h+=`<div class="street"><div class="sthead"><b>${HH_SEC[st]}</b>${bd.map(miniCard).join("")}<span>Pot ₮${H.streetPot[st]?H.streetPot[st].toFixed(2):(H.bb+H.sb).toFixed(2)}</span>${st&&H.actions.some(a=>a.street===st&&a.who==="Hero")?`<button class="cb open" data-open="${i}:${st}">去計算頁分析</button>`:""}</div><ol class="alog">`;
+    for(const a of acts){
+      let extra="";
+      if(a.who==="Hero"&&a.toCall>0&&st>0){
+        const req=a.toCall/(a.potBefore+a.toCall);extra+=` <span class="note">要 ${pct(req)} equity</span>`;
+        const vs=villains.filter(n=>!H.actions.some(b=>b.who===n&&b.verb==="folds"&&H.actions.indexOf(b)<H.actions.indexOf(a))).map(n=>H.shows[n]);
+        if(vs.length){let eq;const nb=a.board.length;
+          if(vs.length===1){const r=equity(H.hero,a.board,[[...vs[0],1]],nb>=4?0:5000);eq=(r.w+r.t/2)/r.n}else eq=equityMulti(H.hero,a.board,vs.map(v=>[[...v,1]]),5000).eq;
+          extra+=` <span class="note ${eq>=req?"ok":"no"}">對手實際手牌計：你得 ${pct(eq)}</span>`}
+        if(st>0)extra+=` <span class="note">你：${TIER_NAME[tierOf(H.hero,a.board)]}</span>`}
+      const amt=a.amt?` ₮${a.amt.toFixed(2)}`:"";
+      if(a.who==="Hero"&&st>0&&a.kind==="bets")extra+=sizingHTML(sizingEval(H,H.actions.indexOf(a)));
+      if(a.who==="Hero"&&st>0&&a.kind==="raises"&&!a.allin)extra+=` <span class="note ${a.to/((a.to-a.amt)+a.toCall)<2.5?"no":""}">raise 到對手注碼嘅 ${(a.to/((a.to-a.amt)+a.toCall)).toFixed(1)} 倍</span>`;
+      h+=`<li class="${a.who==="Hero"?"me":""}">${name(a.who)} ${a.allin?"<b>all in</b>":VERB_NAME[a.kind]||a.verb}${a.kind==="raises"&&!a.allin?` 到 ₮${a.to.toFixed(2)}`:amt}${a.kind==="bets"&&st>0?`（${Math.round(a.amt/a.potBefore*100)}% pot）`:""}${extra}</li>`}
+    h+=`</ol></div>`}
+  if(villains.length)h+=`<div class="msg">攤牌：${villains.map(n=>`${name(n)} ${H.shows[n].map(miniCard).join("")}`).join("　")}</div>`;
+  if(A.allin){const x=A.allin;
+    h+=`<dl class="kv"><dt>All-in 時（${HH_SEC[x.street]}）你嘅 equity</dt><dd>${pct(x.eq)}</dd><dt>按 equity 應得</dt><dd>${sgn(x.ev)}</dd><dt>實際</dt><dd>${sgn(H.net)}</dd><dt>運氣</dt><dd class="${x.luck>=0?"pos":"neg"}">${sgn(x.luck)}</dd></dl>`;
+    if(x.street===3)h+=`<div class="msg">River 先 all in，冇牌再發，結果完全取決於決定本身，唔關運氣。</div>`}
+  return h}
+/* load a hand's decision into the calculator */
+function vilGuide(H,n){
+  const pre=H.actions.filter(a=>a.street===0),pos=H.pos[n]||"BB";
+  const raisers=pre.filter(a=>a.kind==="raises");
+  const myRaise=raisers.findIndex(a=>a.who===n);
+  let act,vs;
+  if(myRaise===0)act="open";
+  else if(myRaise===1){act="threebet";vs=H.pos[raisers[0].who]}
+  else if(myRaise>=2)act="fourbet";
+  else if(raisers.length){const firstIdx=pre.indexOf(raisers[0]);const called=pre.some((a,k)=>k>firstIdx&&a.who===n&&a.kind==="calls");
+    if(called){act=raisers.length>=2?"call3b":"call";vs=H.pos[raisers[0].who]}}
+  if(!act){if(pos==="BB")return{custom:true};act="limp"}
+  return{pos,act,vs}}
+function vilPost(H,n,st,heroIdx){
+  const post={3:null,4:null,5:null};
+  for(let s=1;s<=st;s++){
+    const acts=H.actions.filter((a,k)=>a.street===s&&a.who===n&&(s<st||k<heroIdx));if(!acts.length)continue;
+    const a=acts[acts.length-1],L=[0,3,4,5][s],base=Math.max(.01,a.potBefore-a.toCall);
+    if(a.kind==="raises")post[L]="raise";
+    else if(a.kind==="bets")post[L]=a.amt/a.potBefore>=.66?"big":"small";
+    else if(a.kind==="calls")post[L]=a.toCall/base>=.66?"callB":"callS";
+    else if(a.verb==="checks")post[L]="check"}
+  return post}
+function hhVillainOpps(H,st,heroIdx){
+  const live=Object.keys(H.pos).filter(n=>n!=="Hero"&&!H.actions.some((a,k)=>k<heroIdx&&a.who===n&&a.verb==="folds")&&H.actions.some(a=>a.who===n&&a.street===st||a.who===n&&a.street<st&&a.street>=0)).slice(0,5);
+  return (live.length?live:["?"]).map(n=>{const g=vilGuide(H,n);let o;
+    if(g.custom){o=newOpp("BB","call","BTN");o.guide.custom=true;o.range=topPct(100)}else o=newOpp(g.pos,g.act,g.vs);
+    o.post=vilPost(H,n,st,heroIdx);return o})}
+function sizingEval(H,idx){
+  const a=H.actions[idx],opps=hhVillainOpps(H,a.street,idx),dead=new Set([...H.hero,...a.board]);
+  const lists=opps.map(o=>combosFor(o,a.board,dead).filter(c=>c[2]>.001));if(lists.some(l=>!l.length))return null;
+  const multi=lists.length>1,r=multi?equityMulti(H.hero,a.board,lists,4000):equity(H.hero,a.board,lists[0],4000),eqNow=multi?r.eq:(r.w+r.t/2)/r.n;
+  const pot=a.potBefore,guides=opps.map(o=>o.guide);
+  const rows=SIZES.map(f=>({f,...betEval(H.hero,a.board,lists,guides,pot,pot*f,eqNow,3000)}));
+  const mine={f:a.amt/pot,...betEval(H.hero,a.board,lists,guides,pot,a.amt,eqNow,3000)};
+  const best=rows.reduce((x,y)=>y.evBet>x.evBet?y:x);
+  return{mine,best,evCheck:eqNow*pot,pot}}
+function sizingHTML(z){
+  if(!z)return"";const {mine,best,evCheck,pot}=z,sg=v=>(v>=0?"+":"−")+"₮"+Math.abs(v).toFixed(2);
+  let verdict,cls;
+  if(Math.max(best.evBet,mine.evBet)<evCheck-.03*pot){verdict="模型覺得 check 好過 bet";cls="no"}
+  else if(mine.evBet<evCheck+.03*pot&&best.evBet<evCheck+.03*pot){verdict="Bet 同 check 差唔多";cls=""}
+  else if(best.evBet-mine.evBet<=.05*pot){verdict="注碼合理";cls="ok"}
+  else{verdict=best.f>mine.f?`可以落大啲（${sizeName(best.f)} pot）`:`可以落細啲（${sizeName(best.f)} pot）`;cls="no"}
+  return `<div class="sizing"><span class="note ${cls}">${verdict}</span> 你落 ${Math.round(mine.f*100)}% pot，模型估 EV ${sg(mine.evBet)}；最好係 ${sizeName(best.f)}（${sg(best.evBet)}）；check ${sg(evCheck)}。對手 fold 機會：你嘅大小 ${pct(mine.FE)}。</div>`}
+function hhOpen(i,st){
+  const {H}=HH[i];const mine=H.actions.map((a,k)=>[a,k]).filter(([a])=>a.street===st&&a.who==="Hero");
+  const pickA=[...mine].reverse().find(([a])=>a.toCall>0)||mine[0];const heroIdx=pickA[1],ha=pickA[0];
+  slots=[H.hero[0],H.hero[1],null,null,null,null,null];ha.board.forEach((c,k)=>slots[2+k]=c);active=Math.min(6,2+ha.board.length);
+  opps=hhVillainOpps(H,st,heroIdx);
+  loadCur(0);
+  $("potIn").value=H.streetPot[st].toFixed(2);
+  if(ha.toCall>0){$("callIn").value=ha.toCall.toFixed(2);setFacing(true,true)}else{$("callIn").value="";setFacing(false,true)}
+  renderSlots();setMain("calc");showSec("bet");schedule();window.scrollTo(0,0);
+}
+$("hhFile").addEventListener("change",e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{$("hhText").value="";hhLoad(String(r.result),true)};r.readAsText(f)});
+$("hhGo").onclick=()=>{const t=$("hhText").value;if(t.trim())hhLoad(t,true)};
+$("hhClear").onclick=()=>{HH=[];$("hhText").value="";try{localStorage.removeItem("eqlab-hh")}catch(e){}$("hhMsg").textContent="";$("hhImport").open=true;hhRender()};
+$("hhLeaks").onclick=e=>{const b=e.target.closest("[data-f]");if(!b)return;hhFilter=b.dataset.f;hhRender();$("hhFilters").scrollIntoView({block:"start",behavior:"smooth"})};
+$("hhFilters").onclick=e=>{const b=e.target.closest("[data-f]");if(!b)return;hhFilter=b.dataset.f;hhRender()};
+$("hhList").addEventListener("click",e=>{
+  const o=e.target.closest("[data-open]");if(o){const [i,st]=o.dataset.open.split(":").map(Number);hhOpen(i,st);return}
+  const hd=e.target.closest(".hhead");if(!hd)return;const row=hd.parentElement,det=row.querySelector(".hdet");
+  if(det.hidden&&!det.dataset.done){det.innerHTML=hhDetail(+row.dataset.h);det.dataset.done="1"}
+  det.hidden=!det.hidden;hd.setAttribute("aria-expanded",!det.hidden)});
+
 buildPicker();loadSample();renderStats();
+try{const t=localStorage.getItem("eqlab-hh");if(t)hhLoad(t,false)}catch(e){}
 try{const sec=localStorage.getItem("eqlab-sec");if(sec&&["cards","opp","bet"].includes(sec))showSec(sec)}catch(e){}
 </script>
 
