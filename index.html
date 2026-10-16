@@ -52,9 +52,9 @@ body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:1
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px 40px}
 .app{max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:10px}
 header.top{display:flex;align-items:center;justify-content:space-between;gap:10px}
-h1{font-family:var(--f-display);font-weight:800;font-size:19px;line-height:1.1;margin:0;letter-spacing:-.01em;white-space:nowrap}
-.tabs.main{width:min(200px,56vw);padding:3px;gap:3px;grid-template-columns:repeat(3,1fr)}
-.tabs.main button{padding:6px 8px;font-size:14px}
+h1{font-family:var(--f-display);font-weight:800;font-size:17px;line-height:1.1;margin:0;letter-spacing:-.01em;white-space:nowrap}
+.tabs.main{width:min(232px,62vw);padding:3px;gap:2px;grid-template-columns:repeat(4,1fr)}
+.tabs.main button{padding:6px 2px;font-size:13.5px}
 .tabs.sub3{grid-template-columns:repeat(3,1fr)}
 .tabs.sub3 button{padding:7px}
 .dock{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);display:flex;flex-direction:column;gap:8px;padding-block:6px}
@@ -124,6 +124,26 @@ svg.cum path.f{stroke:var(--good);stroke-dasharray:1.5 3;stroke-linecap:round}sv
 .ln.f{border-color:var(--good);border-top-style:dotted}
 .simt td small{display:block;font-size:11px;color:var(--muted);font-family:var(--f-body);font-weight:400}
 .simt td:first-child{white-space:normal}
+.lvtabs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px}
+.lvb{display:flex;flex-direction:column;align-items:center;gap:1px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:10px;padding:7px 2px;cursor:pointer;font:inherit}
+.lvb b{font:700 13px var(--f-mono)}.lvb span{font-size:11.5px;white-space:nowrap}.lvb i{font-style:normal;font-size:10.5px;color:var(--muted);font-family:var(--f-mono)}
+.lvb[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}.lvb[aria-pressed="true"] i{color:var(--accent-ink)}
+.lvgoal{font:700 17px var(--f-display);line-height:1.3}
+.ms{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.ms li{display:flex;justify-content:space-between;gap:10px;font-size:13.5px;padding:7px 10px;border-radius:9px;background:var(--bg)}
+.ms li b{font:600 12.5px var(--f-mono);text-align:right;white-space:nowrap;color:var(--muted)}
+.ms li.ok{background:var(--good-soft)}.ms li.ok b,.ms li.ok span{color:var(--good)}
+.lessons{display:flex;flex-direction:column}
+.lesson{border-top:1px solid var(--line)}
+.lesson:first-child{border-top:0}
+.lesson summary{cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:11px 2px;font-weight:600;font-size:15px;list-style:none}
+.lesson summary::-webkit-details-marker{display:none}
+.lesson summary::after{content:"＋";color:var(--muted);font-weight:400}
+.lesson[open] summary::after{content:"－"}
+.lesson .done{margin-left:auto;font:600 11px var(--f-body);padding:2px 8px;border-radius:999px;background:var(--good-soft);color:var(--good)}
+.lbody{display:flex;flex-direction:column;gap:10px;padding:0 2px 14px;font-size:14.5px;line-height:1.65}
+.lbody p{margin:0}.lbody ul,.lbody ol{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:5px}
+.lbody .btn{align-self:flex-start;font-size:13px;padding:6px 12px}
 .cb.open{margin-left:auto;padding:4px 10px;font-size:12px}
 .alog{margin:0;padding-left:20px;font-size:13.5px;display:flex;flex-direction:column;gap:3px;color:var(--muted)}
 .alog li.me{color:var(--ink)}
@@ -233,6 +253,7 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;padding-top:4px}
       <button id="tabCalc" role="tab" aria-selected="true">計算</button>
       <button id="tabQuiz" role="tab" aria-selected="false">練習</button>
       <button id="tabHH" role="tab" aria-selected="false">紀錄</button>
+      <button id="tabLearn" role="tab" aria-selected="false">教學</button>
     </div>
   </header>
 
@@ -290,6 +311,13 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;padding-top:4px}
       </div>
       <div id="actOut" aria-live="polite" style="display:flex;flex-direction:column;gap:10px"></div>
     </div>
+  </section>
+
+  <section id="learn" hidden style="flex-direction:column;gap:10px">
+    <div class="panel"><div class="label">撲克課程 <span id="learnProg"></span></div>
+      <div class="msg">由新手到職業分 5 級。每級有課程同升級條件，條件會用你「紀錄」入面嘅數據自動檢查。</div>
+      <div class="lvtabs" id="lvTabs"></div></div>
+    <div id="learnList" style="display:flex;flex-direction:column;gap:10px"></div>
   </section>
 
   <section id="hh" hidden style="flex-direction:column;gap:10px">
@@ -778,11 +806,11 @@ function renderAction(hero,board,lists,eqNow){
 }
 /* tabs */
 function setMain(name){
-  for(const [t,sec] of [["tabCalc","calc"],["tabQuiz","quiz"],["tabHH","hh"]]){const on=sec===name;
+  for(const [t,sec] of [["tabCalc","calc"],["tabQuiz","quiz"],["tabHH","hh"],["tabLearn","learn"]]){const on=sec===name;
     $(t).setAttribute("aria-selected",on);$(sec).hidden=!on;$(sec).style.display=on?"flex":"none"}
-  if(name==="quiz"&&!Q)newQuiz()}
+  if(name==="quiz"&&!Q)newQuiz();if(name==="learn")renderLearn()}
 const setTab=q=>setMain(q?"quiz":"calc");
-$("tabCalc").onclick=()=>setMain("calc");$("tabQuiz").onclick=()=>setMain("quiz");$("tabHH").onclick=()=>setMain("hh");
+$("tabCalc").onclick=()=>setMain("calc");$("tabQuiz").onclick=()=>setMain("quiz");$("tabHH").onclick=()=>setMain("hh");$("tabLearn").onclick=()=>setMain("learn");
 
 /* quiz */
 let Q=null,stats={n:0,c:0,e:0,g:0};
@@ -1444,7 +1472,229 @@ $("hhList").addEventListener("click",e=>{
   if(det.hidden&&!det.dataset.done){det.innerHTML=hhDetail(+row.dataset.h);det.dataset.done="1"}
   det.hidden=!det.hidden;hd.setAttribute("aria-expanded",!det.hidden)});
 
-buildPicker();loadSample();renderStats();
+/* ===== curriculum: 5 levels, beginner → professional ===== */
+const T=(head,rows)=>`<div class="tbl"><table class="sz"><thead><tr>${head.map(x=>`<th>${x}</th>`).join("")}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(x=>`<td>${x}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
+const LEVELS=[
+{lv:1,name:"新手",goal:"識規則、打得穩，唔再犯大錯",lessons:[
+{id:"rules",t:"手牌大細同基本規則",h:`
+<p>由大到細：同花順 → 四條 → 葫蘆 → 同花 → 順子 → 三條 → 兩對 → 一對 → 高牌。</p>
+<ul><li>用 7 張牌（2 張手牌＋5 張公共牌）揀最好嘅 5 張。</li>
+<li><b>Kicker</b>：大家都係一對 A，就比第二大嗰張。A-K 贏 A-Q。</li>
+<li>A 可以做最大（10-J-Q-K-A），亦可以做最細（A-2-3-4-5）。</li>
+<li>公共牌已經係最好嘅 5 張，大家就平分（split pot）。</li></ul>`},
+{id:"position",t:"位置",go:[["練習 preflop 題","quiz"]],h:`
+<p>6 人枱 preflop 出聲次序：UTG → MP → CO → BTN → SB → BB。Flop 之後 SB、BB 先講，BTN 最後。</p>
+<ul><li><b>越後出聲越著數</b>：睇晒其他人做咩先決定，所以可以玩多啲牌。BTN 可以 open 大約 45%，UTG 只有 17% 左右。</li>
+<li><b>盲注冇位置</b>：flop 之後要先講，所以要用好啲嘅牌先入池；BB 已經落咗 1bb，可以防守闊啲。</li></ul>`},
+{id:"equity",t:"Equity 同 pot odds",go:[["去「注碼」計 call 定 fold","calc:bet"],["練習估 equity","quiz"]],h:`
+<p><b>Equity</b>：如果而家直接發晒啲牌，你贏嘅機會有幾大。<b>Pot odds</b>：call 要嘅 equity ＝ 要跟嘅錢 ÷（跟完之後個 pot）。</p>
+${T(["對手落注","你要嘅 equity"],[["1/3 pot","20%"],["1/2 pot","25%"],["3/4 pot","30%"],["1 個 pot","33%"],["2 個 pot","40%"]])}
+<p><b>2 同 4 法則</b>：outs × 4% ≈ flop 睇到 river；outs × 2% ≈ 只睇下一張。</p>
+${T(["Draw","Outs","Flop→River","下一張"],[["同花 draw","9","35%","19%"],["兩頭順 draw","8","31%","17%"],["兩張高張","6","24%","13%"],["卡窿順","4","16%","9%"]])}`},
+{id:"range",t:"咩係 range",go:[["去「對手」揀 range","calc:opp"]],h:`
+<p>你睇唔到對手張牌，所以要估佢<b>可能有嘅所有手牌</b>，呢堆就係 range。</p>
+<ul><li>13×13 格：斜對角係 pair，右上係同花（s），左下係唔同花（o）。</li>
+<li>組合數：pair 6 個、同花 4 個、唔同花 12 個，總共 1326 個。AKo 出現機會係 AKs 嘅 3 倍。</li>
+<li><b>Blocker</b>：你手上或者枱面有嘅牌，對手就冇可能有。</li></ul>`},
+{id:"open",t:"第一個入池：raise 或者 fold",go:[["去「注碼」睇 preflop 建議","calc:bet"],["練習 preflop 題","quiz"]],h:`
+<p>前面全部 fold 到你，<b>只有 raise 或者 fold，唔好 limp</b>。大細 2.5bb，SB 用 3bb。</p>
+${T(["位置","大約 open"],[["UTG","17%"],["MP","22%"],["CO","29%"],["BTN","45%"],["SB","38%"]])}
+<p>Raise 有機會即刻贏盲注，好牌又可以贏大 pot；limp 就俾人平平地入池，或者俾人 raise 迫你放棄。</p>`},
+{id:"limp",t:"面對 limp",go:[["去「注碼」揀「有人 limp」","calc:bet"]],h:`
+<ul><li><b>好牌加注孤立佢</b>：3bb＋每個 limp 加 1bb，冇位置再加 1bb。</li>
+<li><b>細 pair、同花連張</b>可以跟住 limp，博中 set 或者大牌。</li><li>其他弱牌 fold。BB 冇人 raise 就 check。</li></ul>`},
+{id:"tilt",t:"Tilt 同停損",h:`
+<ul><li>輸咗大 pot、俾人追中之後，最容易越打越想追返，即係 tilt。</li>
+<li>定停損線，例如一日輸 3 個 buy-in 就停。夜深、攰、飲咗酒都唔好打。</li>
+<li>輸咗去「紀錄」睇 all-in 運氣：決定冇錯就係運氣，唔使改打法。</li></ul>`},
+{id:"bankroll",t:"資金管理",h:`
+<ul><li>Cash game 一般建議至少有 20–40 個 buy-in 先打嗰個級別。</li>
+<li>輸到唔夠就降返細一級，唔好加注碼追數。只用輸得起嘅錢打。</li></ul>`},
+{id:"rules2",t:"平台規則",h:`
+<p>所有網上平台都禁止打牌期間用即時輔助工具（包括計 equity、睇 range 表），捉到會封 account、沒收餘額，對其他玩家亦唔公平。呢個 app 係用嚟<b>打完之後 review 同練習</b>。</p>`},
+{id:"howto",t:"建議嘅練習流程",go:[["去「紀錄」匯入","hh"],["去「練習」","quiz"]],h:`
+<ol><li>打完一個 session，喺 CoinPoker 匯出手牌紀錄。</li><li>去「紀錄」匯入，睇「主要問題」同累積輸贏圖。</li>
+<li>撳入有問題嘅手牌，睇每條街分析；撳「去計算頁分析」自己試。</li><li>去「練習」做題，將知識變成直覺。</li>
+<li>每隔幾日匯入新紀錄，紀錄會累積。</li></ol>`}]},
+
+{lv:2,name:"微注贏家",goal:"穩定打贏娛樂型玩家",lessons:[
+{id:"vsraise",t:"面對 raise：3-bet、call 定 fold",go:[["去「注碼」揀「有人 raise」","calc:bet"]],h:`
+<ul><li><b>3-bet 大細</b>：有位置 3 倍、冇位置 4 倍對手注碼；前面每多一個人 call 再加 1 倍。</li>
+<li><b>3-bet 用</b>強牌（TT+、AQ+）加少量 bluff（A5s、A4s）。</li>
+<li><b>Call 要睇對手位置</b>：CO call UTG 只有大約 8%，BB call BTN 可以去到 40%。對手開到 4bb 以上要收緊。</li></ul>`},
+{id:"3bet4bet",t:"被 3-bet、被 4-bet",go:[["去「注碼」揀情況","calc:bet"]],h:`
+<p><b>Open 後被 3-bet</b>：4-bet 用 QQ+、AK、少量 A5s（大約 2.2–2.5 倍）；JJ–88、AQ、同花大牌 call；其他 fold。</p>
+<p><b>3-bet 後被 4-bet</b>：微注枱多數係 QQ+、AK。100bb 嘅話 QQ+、AK all in；JJ、TT、AQs call；其他 fold。</p>`},
+{id:"cbet",t:"C-bet 基礎",h:`
+<p>Preflop 你 raise、對手 call，flop 你繼續落注就係 c-bet（continuation bet）。</p>
+<ul><li><b>單挑、有位置、乾牌面</b>（例如 K-7-2 唔同花）：可以經常細注 c-bet（25–33% pot），因為呢啲牌面你嘅 range 有利。</li>
+<li><b>濕牌面</b>（例如 9-8-7 兩隻同花）：對手 call 嘅牌好多都中咗，要 check 多啲，有牌先落大啲。</li>
+<li><b>多人底池</b>：c-bet 要少好多，冇牌就 check。</li>
+<li>俾人 call 咗 flop，turn 冇改善又冇 draw，通常就放棄。</li></ul>`},
+{id:"thinvalue",t:"Value bet：微注枱最賺錢嘅技巧",go:[["去「紀錄」睇注碼習慣","hh"]],h:`
+<p>微注枱對手 call 得太多、bluff 得太少。贏錢最主要靠 <b>value bet</b>：有牌就落注，等差過你嘅牌 call 你。</p>
+<ul><li>Top pair 好 kicker、overpair 喺大部分牌面都應該連續落三條街。</li>
+<li>River 有中強牌、對手係 calling station，可以「薄」啲 value bet：佢會用更差嘅 pair call。</li>
+<li>問自己：如果我落注，佢有冇比我差嘅牌會 call？有就落。</li></ul>`},
+{id:"setmine",t:"細 pair、implied odds 同 set mining",h:`
+<p>細 pair 中 set 嘅機會大約 12%（約 8 次中 1 次）。所以用細 pair call 一個 raise，主要靠中 set 之後贏對手大量籌碼，即係 <b>implied odds</b>。</p>
+<ul><li>經驗法則：雙方有效籌碼至少係你 call 嘅 15–20 倍，先值得用細 pair set mine。</li>
+<li>對手籌碼短、或者 raise 好大，就 fold 細 pair。</li>
+<li>冇中 set 又面對落注，通常 fold，唔好用 underpair 硬撐。</li></ul>`},
+{id:"narrow",t:"跟住對手動作收窄 range",go:[["去「對手」揀每條街動作","calc:opp"]],h:`
+${T(["對手做咗","佢 range 會點變"],[["Check","最強嘅牌少咗"],["Call 細注","有 pair、draw、甚至高張"],["Call 大注","多數 top pair 以上同強 draw"],["細注 bet","好闊，有價值牌亦有 bluff"],["大注 bet","多數強牌或者強 draw"],["Raise","最強訊號，set、兩對以上為主"]])}`},
+{id:"sizing",t:"注碼大細",go:[["去「紀錄」睇你嘅注碼習慣","hh"]],h:`
+<ul><li><b>強牌落大啲</b>：50–100% pot。微注枱對手鍾意 call，唔好落細注慳佢。</li>
+<li><b>中等牌</b>：check 或者細注，落大注只會趕走差過你嘅牌。</li>
+<li><b>Bluff 同 value 用相近大細</b>，唔好俾對手睇注碼就知你有冇嘢。</li>
+<li><b>Raise 至少 2.5 倍</b>對手注碼。</li></ul>`},
+{id:"bluff",t:"Bluff 同 fold equity",go:[["去「注碼」睇 bet 大細表","calc:bet"]],h:`
+<p>純 bluff 要對手 fold 幾多先唔蝕 ＝ 你落嘅注 ÷（pot＋你落嘅注）。</p>
+${T(["你落","對手要 fold"],[["1/3 pot","25%"],["1/2 pot","33%"],["3/4 pot","43%"],["1 個 pot","50%"]])}
+<ul><li><b>半 bluff 最好</b>：有 draw 先 bluff，俾人 call 都仲有機會中。</li><li><b>唔好 bluff calling station</b>。</li></ul>`},
+{id:"river",t:"River 大注同 raise",go:[["去「紀錄」揀「Call 咗但 equity 唔夠」","hh"]],h:`
+<p>微注枱 river 好少 bluff。對手 river 落大注、all in 或者 raise，大部分係真牌。得一對、或者俾牌面拖累嘅兩對，要捨得 fold。</p>
+<p>例：你 9♠8♦ 喺 A 高牌面，對手 check-raise、turn 再落、river all in，你中 pair call 落去輸 ₮25；按佢 range 你只有大約 6% equity。</p>`},
+{id:"multi",t:"多人底池",go:[["去「對手」加對手","calc:opp"]],h:`
+<ul><li>要同時贏晒所有人：AA 對 KK 有 81%，加多個 QQ 就跌到大約 67%。</li>
+<li>多人底池用更強嘅牌先入錢，bluff 少好多；top pair 喺 4 人底池可能只係中等。</li></ul>`},
+{id:"variance",t:"EV、運氣同樣本",go:[["去「紀錄」睇 all-in 運氣","hh"]],h:`
+<ul><li>好嘅決定係 EV 正，唔係「今次贏咗」。80% 贏面每 5 次都會輸 1 次。</li>
+<li><b>All-in EV</b>：按入錢嗰刻 equity 計應得幾多，實際同應得嘅差距就係運氣。</li>
+<li>幾百手樣本運氣主宰結果，要幾萬手先睇得清真實水平。</li></ul>`},
+{id:"stats",t:"讀懂自己嘅數據",go:[["去「紀錄」睇你嘅數據","hh"]],h:`
+${T(["指標","意思","6-max 參考"],[["VPIP","主動入池嘅比率","22–28%"],["PFR","Preflop raise 嘅比率","18–22%"],["3-bet","面對 open 時 3-bet","6–9%"],["Fold to c-bet","面對 c-bet fold","40–55%"],["WTSD","睇到 flop 後去到攤牌","25–30%"],["W$SD","攤牌贏嘅比率","50%+"]])}
+<p>VPIP 同 PFR 差距大（例如 50% 對 1%）代表你 call 得太多、raise 得太少，係微注最常見嘅漏洞。</p>`}]},
+
+{lv:3,name:"中級",goal:"打贏常規玩家，開始用 range 思考",lessons:[
+{id:"texture",t:"牌面結構同 range 優勢",h:`
+<ul><li><b>乾牌面</b>（K-7-2 唔同花）：好少 draw，牌力比較固定。</li><li><b>濕牌面</b>（J-T-9 兩隻同花）：好多 draw，牌力隨時變。</li>
+<li><b>Range 優勢</b>：邊個 range 喺呢個牌面平均強啲。Preflop raise 嘅人喺 A、K 高牌面通常有優勢；BB call 嘅人喺 6-5-4 呢類細牌面有優勢。</li>
+<li><b>Nut 優勢</b>：邊個 range 有多啲最強嘅牌。有 nut 優勢嘅一方可以落大注甚至 overbet。</li></ul>
+<p>決定之前先問：呢個牌面幫邊個？</p>`},
+{id:"polar",t:"Polarized 同 linear range",h:`
+<ul><li><b>Polarized（兩極化）</b>：只有好強同好弱（bluff），冇中間。大注、overbet、river raise 通常係 polarized。</li>
+<li><b>Linear（線性）</b>：由最強一路落到中等，冇純 bluff。細注、preflop 對住鬆嘅玩家 3-bet 通常係 linear。</li>
+<li>大注配 polarized range，細注配 linear／merged range。</li></ul>`},
+{id:"mdf",t:"最少防守頻率（MDF）",h:`
+<p>對手落注，你要繼續（call 或者 raise）幾多先唔會俾佢任何兩張牌 bluff 都有錢賺：MDF ＝ pot ÷（pot＋注）。</p>
+${T(["對手落","你最少要繼續"],[["1/3 pot","75%"],["1/2 pot","67%"],["3/4 pot","57%"],["1 個 pot","50%"],["2 個 pot","33%"]])}
+<p>呢個係理論底線。微注枱對手少 bluff，實際可以 fold 多過 MDF；但如果你成日 fold，識打嘅人就會不停 bluff 你。</p>`},
+{id:"blockers",t:"用 blocker 揀 bluff",h:`
+<ul><li>揀 bluff 嘅牌，最好擋住對手最強嘅牌、但唔擋佢會 fold 嘅牌。</li>
+<li>例：同花牌面 river，你手上有 A♠（同花最大張），對手冇可能有 nut flush，用嚟 bluff raise 會更有效。</li>
+<li>Preflop 用 A5s 3-bet bluff，因為 A 擋住對手 AA、AK。</li></ul>`},
+{id:"spr",t:"SPR 同籌碼深度",h:`
+<p><b>SPR</b> ＝ flop 時有效籌碼 ÷ pot。</p>
+${T(["SPR","意思"],[["少過 3","Top pair 已經可以全入"],["4–8","Top pair 要小心，兩對以上先好舒服"],["多過 10","要好強嘅牌先值得全入，implied odds 牌更有價值"]])}
+<p>籌碼越深，細 pair、同花連張越值錢；籌碼越短，大牌越值錢。</p>`},
+{id:"plan",t:"成手牌嘅計劃",h:`
+<ul><li>Flop 落注之前，諗定 turn、river 會點：邊啲牌繼續落、邊啲牌放棄。</li>
+<li>計清楚：如果三條街都落 2/3 pot，最後會唔會全入？夠唔夠牌力？</li>
+<li>Draw 就揀好邊張 turn 牌繼續 semi-bluff（例如中 draw 或者多咗 outs 嘅牌）。</li></ul>`},
+{id:"exploit",t:"針對唔同類型對手",go:[["去「對手」設定 Bluff／Fold 傾向","calc:opp"]],h:`
+${T(["類型","特徵","點對付"],[["Calling station","乜都 call","唔好 bluff，有牌就大注 value"],["Nit（好緊）","只玩大牌","佢落注就 fold，多啲偷盲"],["鬆兇（LAG）","成日 raise","用強牌 call 落去或者 3-bet，唔好亂 bluff"],["緊兇（TAG）","常規玩家","接近 GTO 打法，搵佢 fold 太多嘅位"]])}`},
+{id:"gto",t:"GTO 同 exploit",h:`
+<ul><li><b>GTO</b>：理論上冇人可以佔你便宜嘅打法，係一個基準。</li>
+<li><b>Exploit</b>：針對對手弱點調整。微注枱：多 value bet、少 bluff、尊重 river 大注同 raise。</li>
+<li>先學識 GTO 大方向，再按對手偏離佢。</li></ul>`}]},
+
+{lv:4,name:"高級",goal:"用 solver 讀書，打中級別",lessons:[
+{id:"mixed",t:"混合策略同頻率",h:`
+<p>Solver 好多時會話同一手牌「40% bet、60% check」。原因係如果你每次都一樣，對手就可以針對你。</p>
+<ul><li>實戰簡化：揀主要嘅動作，或者用隨機方法（例如睇手錶秒數）決定。</li>
+<li>重點唔係記晒頻率，而係明白點解呢手牌兩樣都得。</li></ul>`},
+{id:"overbet",t:"Overbet 同大注",h:`
+<ul><li>當你有 <b>nut 優勢</b>（你 range 有好多最強嘅牌，對手好少），可以落多過 pot 嘅注。</li>
+<li>Overbet 嘅 range 一定係 polarized：nuts 加 bluff。</li>
+<li>常見位置：turn 出咗一張幫你 range 嘅牌，例如你 preflop 3-bet，turn 出 A。</li></ul>`},
+{id:"lines",t:"Check-raise、delayed c-bet、probe",h:`
+<ul><li><b>Check-raise</b>：冇位置嘅一方用強牌同強 draw 反擊 c-bet。濕牌面頻率高啲。</li>
+<li><b>Delayed c-bet</b>：flop check 過，turn 先落注，代表你 flop 想控制 pot 或者 turn 改善咗。</li>
+<li><b>Probe bet</b>：對手 flop 冇 c-bet，你 turn 主動落注，因為佢 range 示弱。</li></ul>`},
+{id:"3betpot",t:"3-bet pot 同 4-bet pot",h:`
+<ul><li>SPR 細好多（大約 3–4），top pair 好多時已經可以全入。</li>
+<li>3-bet 嘅人喺高牌面有 range 優勢，可以細注頻繁 c-bet。</li>
+<li>Call 3-bet 嘅人要喺細牌面、連牌面更積極。</li></ul>`},
+{id:"icm",t:"錦標賽同 ICM 基礎",h:`
+<ul><li>錦標賽嘅籌碼唔等於錢：輸晒就出局，贏多咗籌碼價值增加得少。</li>
+<li><b>ICM</b> 將籌碼換算做獎金價值。接近錢圈或者決賽枱，要比 cash game 更緊咁 call all in。</li>
+<li>短籌碼（15bb 以下）用 push／fold 表。</li></ul>`},
+{id:"solver",t:"點樣用 solver 讀書",h:`
+<ol><li>喺自己嘅紀錄揀常見又輸錢嘅情況（例如 BTN 對 BB 單挑 c-bet）。</li>
+<li>用 solver 睇整體策略（aggregate report），學大方向：幾時 bet、bet 幾大。</li>
+<li>再睇具體手牌，問「點解」，唔好死記。</li>
+<li>Node locking：設定對手有某種漏洞（例如 fold 太多），睇最佳策略點變，就係 exploit 嘅方法。</li>
+<li>每星期定時 review，同讀書小組討論。</li></ol>`}]},
+
+{lv:5,name:"職業",goal:"將撲克當職業嘅現實要求",lessons:[
+{id:"volume",t:"手數、勝率同 variance",h:`
+<ul><li>6-max 嘅標準差大約每 100 手 80–100bb。即係就算你係贏家，輸 20–30 個 buy-in 嘅 downswing 都好正常。</li>
+<li>要大約 10 萬手以上，先可以比較有信心咁講自己係贏家。</li>
+<li>贏家勝率通常大約每 100 手 2–8bb，級別越高越低。</li></ul>`},
+{id:"probank",t:"職業資金管理",h:`
+<ul><li>職業玩家一般預留 50–100 個 buy-in 嘅打牌資金。</li>
+<li>另外要有 6–12 個月生活費，唔好同打牌資金混埋。</li>
+<li>Rakeback、rake 高低對收入影響好大，揀平台同級別要計埋。</li></ul>`},
+{id:"system",t:"學習同工作系統",h:`
+<ul><li>常見分配：大約 70% 時間打牌、30% 讀書同 review。</li>
+<li>每個 session 之後 review 大 pot 同標記咗嘅手牌；每星期分析一次資料庫，搵最大嘅漏洞。</li>
+<li>搵教練或者讀書小組，旁觀者睇到你自己睇唔到嘅錯。</li></ul>`},
+{id:"agame",t:"表現管理",h:`
+<ul><li>分清你嘅 A-game、B-game、C-game，C-game 出現就停。</li>
+<li>瞓覺、運動、飲食直接影響決定質素。</li>
+<li>揀枱：同弱嘅玩家打先係最大嘅收入來源。</li></ul>`},
+{id:"reality",t:"轉職業之前嘅現實",h:`
+<ul><li>大部分玩家長期都係輸家，能夠靠撲克維生嘅只係少數。</li>
+<li>考慮轉職業之前，最好有大量樣本（幾十萬手）證明你喺目標級別穩定贏錢，同時有足夠資金同生活費。</li>
+<li>保留正職、當業餘高手，通常係更穩陣嘅選擇。</li></ul>`}]}
+];
+let readSet=new Set();try{readSet=new Set(JSON.parse(localStorage.getItem("eqlab-read")||"[]"))}catch(e){}
+let curLv=1;try{curLv=+localStorage.getItem("eqlab-lv")||1}catch(e){}
+/* milestones measured from the user's own records */
+function learnCtx(){
+  const c={n:HH.length,quizN:stats.n,quizAcc:stats.n?stats.c/stats.n:0};
+  if(HH.length){const S=summarise(HH);simulateAll(HH);c.S=S;
+    c.vpip=S.nonBomb?S.vpip/S.nonBomb:0;c.pfr=S.nonBomb?S.pfr/S.nonBomb:0;c.limp=S.hands?S.limp/S.hands:0;
+    c.adj=HH.reduce((a,x)=>a+(x.A.allin&&x.A.allin.street<3?x.A.allin.ev:x.H.net)/x.H.bb,0)/HH.length*100;
+    c.badCall=S.dec.call?S.dec.callBad/S.dec.call:0}
+  return c}
+const P0=x=>Math.round(x*100)+"%";
+const MILESTONES={
+ 1:[["讀晒新手課程",c=>({v:`${LEVELS[0].lessons.filter(l=>readSet.has(l.id)).length}／${LEVELS[0].lessons.length}`,ok:LEVELS[0].lessons.every(l=>readSet.has(l.id))})],
+    ["第一個入池唔 limp（≤2% 手牌）",c=>c.n?{v:P0(c.limp),ok:c.limp<=.02}:null],
+    ["VPIP 18–30%",c=>c.n?{v:P0(c.vpip),ok:c.vpip>=.18&&c.vpip<=.3}:null],
+    ["PFR 12% 以上",c=>c.n?{v:P0(c.pfr),ok:c.pfr>=.12}:null],
+    ["練習 50 題以上，正確率 80%+",c=>({v:`${c.quizN} 題 · ${P0(c.quizAcc)}`,ok:c.quizN>=50&&c.quizAcc>=.8})]],
+ 2:[["累積 5 萬手紀錄",c=>({v:c.n.toLocaleString(),ok:c.n>=50000})],
+    ["扣除運氣後 bb/100 ≥ 0",c=>c.n?{v:c.adj.toFixed(1),ok:c.adj>=0}:null],
+    ["Call 咗但 equity 唔夠 ≤ 10%",c=>c.n&&c.S.dec.call?{v:P0(c.badCall),ok:c.badCall<=.1}:null],
+    ["PFR ÷ VPIP ≥ 0.7",c=>c.n&&c.vpip?{v:(c.pfr/c.vpip).toFixed(2),ok:c.pfr/c.vpip>=.7}:null]],
+ 3:[["累積 10 萬手",c=>({v:c.n.toLocaleString(),ok:c.n>=100000})],["扣除運氣後 bb/100 ≥ 3",c=>c.n?{v:c.adj.toFixed(1),ok:c.adj>=3}:null]],
+ 4:[["累積 20 萬手，喺 NL50 或以上",c=>({v:c.n.toLocaleString(),ok:false})],["每星期 solver review",()=>null],["有教練或者讀書小組",()=>null]],
+ 5:[["幾十萬手樣本證明穩定贏錢",()=>null],["50–100 個 buy-in 資金＋6–12 個月生活費",()=>null]]};
+function renderLearn(){
+  const L=LEVELS.find(x=>x.lv===curLv)||LEVELS[0],c=learnCtx();
+  const all=LEVELS.flatMap(x=>x.lessons);
+  $("learnProg").textContent=`已讀 ${all.filter(l=>readSet.has(l.id)).length}／${all.length}`;
+  $("lvTabs").innerHTML=LEVELS.map(x=>{const r=x.lessons.filter(l=>readSet.has(l.id)).length;
+    return `<button class="lvb" data-lv="${x.lv}" aria-pressed="${x.lv===curLv}"><b>Lv${x.lv}</b><span>${x.name}</span><i>${r}/${x.lessons.length}</i></button>`}).join("");
+  const ms=MILESTONES[L.lv].map(([t,f])=>{const r=f(c);return `<li class="${r&&r.ok?"ok":""}"><span>${r&&r.ok?"✓":"○"} ${t}</span><b>${r?r.v:"自己評估"}</b></li>`}).join("");
+  $("learnList").innerHTML=`<div class="panel"><div class="label">Level ${L.lv}・${L.name}</div><div class="lvgoal">${L.goal}</div>
+    <div class="label" style="margin-top:4px">升級條件 <span>${c.n?`按你 ${c.n} 手紀錄`:"匯入紀錄後自動計"}</span></div><ul class="ms">${ms}</ul></div>
+  <div class="panel"><div class="lessons">${L.lessons.map(l=>`
+    <details class="lesson" data-id="${l.id}"><summary><span class="ltitle">${l.t}</span>${readSet.has(l.id)?'<span class="done">已讀</span>':""}</summary>
+    <div class="lbody">${l.h}${l.go?`<div class="row">${l.go.map(([n,g])=>`<button class="cb" data-go="${g}">${n}</button>`).join("")}</div>`:""}
+    <button class="btn" data-read="${l.id}">${readSet.has(l.id)?"標記為未讀":"標記為已讀"}</button></div></details>`).join("")}</div></div>`;
+}
+$("lvTabs").addEventListener("click",e=>{const b=e.target.closest("[data-lv]");if(!b)return;curLv=+b.dataset.lv;try{localStorage.setItem("eqlab-lv",curLv)}catch(err){}renderLearn()});
+$("learnList").addEventListener("click",e=>{
+  const g=e.target.closest("[data-go]");if(g){const [m,s]=g.dataset.go.split(":");setMain(m);if(s)showSec(s);window.scrollTo(0,0);return}
+  const r=e.target.closest("[data-read]");if(r){const id=r.dataset.read;readSet.has(id)?readSet.delete(id):readSet.add(id);
+    try{localStorage.setItem("eqlab-read",JSON.stringify([...readSet]))}catch(err){}
+    renderLearn();const d=document.querySelector(`.lesson[data-id="${id}"]`);if(d)d.open=true}});
+
+buildPicker();loadSample();renderStats();renderLearn();
 try{const t=localStorage.getItem("eqlab-hh");if(t)hhLoad(t,false)}catch(e){}
 try{const sec=localStorage.getItem("eqlab-sec");if(sec&&["cards","opp","bet"].includes(sec))showSec(sec)}catch(e){}
 </script>
