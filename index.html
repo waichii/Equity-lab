@@ -55,7 +55,7 @@ header.top{display:flex;align-items:center;justify-content:space-between;gap:10p
 h1{font-family:var(--f-display);font-weight:800;font-size:17px;line-height:1.1;margin:0;letter-spacing:-.01em;white-space:nowrap}
 .tabs.main{width:min(232px,62vw);padding:3px;gap:2px;grid-template-columns:repeat(4,1fr)}
 .tabs.main button{padding:6px 2px;font-size:13.5px}
-.tabs.sub3{grid-template-columns:repeat(3,1fr)}
+.tabs.sub3{grid-template-columns:repeat(4,1fr)}
 .tabs.sub3 button{padding:7px}
 .dock{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);display:flex;flex-direction:column;gap:8px;padding-block:6px}
 .summary{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 12px;display:flex;flex-direction:column;gap:7px;min-height:96px;transition:opacity .15s}
@@ -133,6 +133,21 @@ svg.cum path.f{stroke:var(--good);stroke-dasharray:1.5 3;stroke-linecap:round}sv
 .ms li{display:flex;justify-content:space-between;gap:10px;font-size:13.5px;padding:7px 10px;border-radius:9px;background:var(--bg)}
 .ms li b{font:600 12.5px var(--f-mono);text-align:right;white-space:nowrap;color:var(--muted)}
 .ms li.ok{background:var(--good-soft)}.ms li.ok b,.ms li.ok span{color:var(--good)}
+.mq{font:600 18px var(--f-body);line-height:1.5}
+.mopts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mo{padding:13px 8px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:600 15px var(--f-body);cursor:pointer}
+.mo.right{background:var(--good-soft);border-color:var(--good);color:var(--good)}
+.mo.wrong{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+.mo:disabled{cursor:default}
+.cb small{font-family:var(--f-mono);font-size:11px;opacity:.75}
+.hgrid{gap:2px}
+.hcell{aspect-ratio:1;border:0;border-radius:3px;padding:0;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.05;cursor:pointer;font-family:var(--f-mono);min-width:0;overflow:hidden}
+.hcell span{font-size:7.5px;opacity:.85;letter-spacing:-.04em}.hcell b{font-size:10px}
+.hcell.me{outline:2px solid var(--ink);outline-offset:-1px}.hcell.sel{outline:2px solid var(--accent);outline-offset:-2px}
+@media (min-width:430px){.hcell span{font-size:8.5px}.hcell b{font-size:11px}}
+.sw{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-2px;margin-right:4px;border:1px solid var(--line)}
+.steps .sz{font-size:12.5px}.steps .why{margin:4px 0 0;padding-left:16px;display:flex;flex-direction:column;gap:6px;font-size:13px}.steps small{color:var(--muted)}.steps .sz td,.steps .sz th{padding-inline:4px}
+.steps{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:9px;font-size:14px;line-height:1.6}
 .lessons{display:flex;flex-direction:column}
 .lesson{border-top:1px solid var(--line)}
 .lesson:first-child{border-top:0}
@@ -264,6 +279,7 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;padding-top:4px}
         <button data-s="cards" role="tab" aria-selected="true">牌</button>
         <button data-s="opp" role="tab" aria-selected="false">對手</button>
         <button data-s="bet" role="tab" aria-selected="false">注碼</button>
+        <button data-s="heat" role="tab" aria-selected="false">熱力圖</button>
       </div>
     </div>
 
@@ -311,6 +327,15 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;padding-top:4px}
       </div>
       <div id="actOut" aria-live="polite" style="display:flex;flex-direction:column;gap:10px"></div>
     </div>
+    <div class="panel" data-sec="heat" hidden>
+      <div class="label">Equity 熱力圖 <span>對手 range 跟「對手」分頁</span></div>
+      <div class="msg">每一格係你拎嗰款牌，對住對手而家嘅 range 有幾多 equity。喺「對手」分頁改 preflop 或者每條街嘅動作、喺「牌」分頁加公共牌，熱力圖都會跟住變。</div>
+      <div class="chips" id="heatModes"></div>
+      <div class="legend" id="heatLegend"></div>
+      <div class="grid hgrid" id="heatGrid"></div>
+      <div class="msg" id="heatStatus"></div>
+      <div id="heatDemo" style="display:flex;flex-direction:column;gap:10px"></div>
+    </div>
   </section>
 
   <section id="learn" hidden style="flex-direction:column;gap:10px">
@@ -337,7 +362,9 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;padding-top:4px}
     </div>
   </section>
 
-  <section id="quiz" hidden style="flex-direction:column;gap:14px">
+  <section id="quiz" hidden style="flex-direction:column;gap:12px">
+    <div class="tabs" id="quizMode" role="tablist"><button data-qm="scen" role="tab" aria-selected="true">情境題</button><button data-qm="memo" role="tab" aria-selected="false">背誦</button></div>
+    <div id="quizScen" style="display:flex;flex-direction:column;gap:14px">
     <div class="panel">
       <div class="stats">
         <div class="stat"><b id="stN">0</b><span>題數</span></div>
@@ -347,6 +374,8 @@ footer{color:var(--muted);font-size:12.5px;text-align:center;padding-top:4px}
     </div>
     <div class="panel" id="qPanel"></div>
     <div class="row"><button class="btn" id="resetStats">重設紀錄</button></div>
+    </div>
+    <div id="memo" hidden style="display:flex;flex-direction:column;gap:10px"></div>
   </section>
 
 </div>
@@ -734,7 +763,7 @@ function renderMakeup(combos,board){
   <div class="legend" style="margin-top:6px">${g.map((x,i)=>`<span><i class="dot k${i+1}"></i>${names[i]} <b>${(x/tot*100).toFixed(0)}%</b></span>`).join("")}</div>`;
 }
 
-function schedule(){clearTimeout(timer);saveCur();renderGuide();$("result").classList.add("busy");timer=setTimeout(compute,40)}
+function schedule(){clearTimeout(timer);saveCur();renderGuide();$("result").classList.add("busy");timer=setTimeout(()=>{compute();runHeat()},40)}
 function miniCards(){
   const mk=i=>{const c=slots[i];return c==null?`<button class="mc empty" data-mi="${i}" aria-label="${SLOT_HINT[i]}">+</button>`
     :`<button class="mc c${c&3}" data-mi="${i}" aria-label="${rl(c>>2)}${SYM[c&3]}">${rl(c>>2)}<small>${SYM[c&3]}</small></button>`};
@@ -745,7 +774,8 @@ function setSummary(main,pill){
 function showSec(name){
   document.querySelectorAll("[data-sec]").forEach(el=>el.hidden=el.dataset.sec!==name);
   document.querySelectorAll("#subTabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.s===name));
-  try{localStorage.setItem("eqlab-sec",name)}catch(e){}}
+  try{localStorage.setItem("eqlab-sec",name)}catch(e){}
+  if(name==="heat")runHeat()}
 $("subTabs").onclick=e=>{const b=e.target.closest("[data-s]");if(b)showSec(b.dataset.s)};
 $("result").addEventListener("click",e=>{const m=e.target.closest("[data-mi]");if(!m)return;active=+m.dataset.mi;showSec("cards");renderSlots()});
 function compute(){
@@ -1536,13 +1566,29 @@ ${T(["位置","大約 open"],[["UTG","17%"],["MP","22%"],["CO","29%"],["BTN","45
 <ul><li>Top pair 好 kicker、overpair 喺大部分牌面都應該連續落三條街。</li>
 <li>River 有中強牌、對手係 calling station，可以「薄」啲 value bet：佢會用更差嘅 pair call。</li>
 <li>問自己：如果我落注，佢有冇比我差嘅牌會 call？有就落。</li></ul>`},
-{id:"setmine",t:"細 pair、implied odds 同 set mining",h:`
-<p>細 pair 中 set 嘅機會大約 12%（約 8 次中 1 次）。所以用細 pair call 一個 raise，主要靠中 set 之後贏對手大量籌碼，即係 <b>implied odds</b>。</p>
-<ul><li>經驗法則：雙方有效籌碼至少係你 call 嘅 15–20 倍，先值得用細 pair set mine。</li>
-<li>對手籌碼短、或者 raise 好大，就 fold 細 pair。</li>
-<li>冇中 set 又面對落注，通常 fold，唔好用 underpair 硬撐。</li></ul>`},
+{id:"setmine",t:"細 pair、implied odds 同 set mining",go:[["去熱力圖睇細對子計法","calc:heat"]],h:`
+<p>細 pair 中 set 嘅機會大約 12%（約 8 次中 1 次）。所以用細 pair call 一個 raise，主要靠中 set 之後贏對手大量籌碼，即係 <b>implied odds</b>（之後街先贏到嘅錢）。</p>
+<p><b>點計</b>：8 次入面 1 次中、7 次落空。落空嗰 7 次你輸咗 call 嘅錢，所以中嗰次要贏返 7 倍以上：<b>中 set 要額外贏 ≥ 7.3 × call − 而家個 pot</b>。對手唔係次次都俾晒籌碼，所以經驗法則係<b>剩低籌碼要有 call 嘅 15–20 倍</b>。</p>
+<p><b>SPR</b>（stack-to-pot ratio）＝ 翻牌後每人剩低嘅籌碼 ÷ 個 pot。SPR 大，中咗 set 之後仲有好多籌碼可以贏；SPR 細，最多都係贏返剩低嗰少少。</p>
+${T(["100bb 籌碼","普通 raise pot","3-bet pot"],[["你要 call","2.5bb","9bb（補 6.5bb）"],["翻牌前個 pot","約 6.5bb","約 19.5bb"],["每人剩低","97.5bb","91bb"],["SPR","約 15","約 4.7"],["剩低 ÷ 你 call","39 倍 ✓","14 倍 ✗"]])}
+<p>3-bet pot 入面 pot 已經好大、籌碼相對 pot 好短：就算中 set，最多贏到 91bb，但你要 8 次 call 6.5bb（52bb）先中一次，而且對手唔係次次 stack off。所以細對子面對 3-bet 通常 fold。</p>
+<ul><li>對手籌碼短、或者 raise 好大，就 fold 細 pair。</li>
+<li>冇中 set 又面對落注，通常 fold，唔好用 underpair 硬撐。</li>
+<li>Equity 數字（例如 22 對 range 有 36%）唔代表攞得到：細對子冇中 set 好難去到 showdown，呢個叫 equity realization 差。</li></ul>`},
 {id:"narrow",t:"跟住對手動作收窄 range",go:[["去「對手」揀每條街動作","calc:opp"]],h:`
 ${T(["對手做咗","佢 range 會點變"],[["Check","最強嘅牌少咗"],["Call 細注","有 pair、draw、甚至高張"],["Call 大注","多數 top pair 以上同強 draw"],["細注 bet","好闊，有價值牌亦有 bluff"],["大注 bet","多數強牌或者強 draw"],["Raise","最強訊號，set、兩對以上為主"]])}`},
+{id:"bucket",t:"用分類心算 equity",go:[["去熱力圖睇計法示範","calc:heat"]],h:`
+<p>App 計 equity 嘅方法，你都可以喺腦入面做：<b>Equity ≈ Σ（每類牌佔對手 range 嘅比例 × 你對嗰類牌嘅 equity）</b>。</p>
+<p><b>第 1 步：數組合</b>。每款對子 6 個組合（4 張揀 2），同花 4 個，唔同花 12 個，全副牌 1326 個。你手上嘅牌會擋咗（blocker）部分組合：你拎住一張 K，KK 由 6 個變 3 個，AK 由 16 個變 12 個。</p>
+${T(["牌款","組合"],[["對子（例如 JJ）","6"],["同花（例如 AQs）","4"],["唔同花（例如 AQo）","12"],["AQ 全部","16"]])}
+<p><b>第 2 步：分類</b>。將對手 range 分成幾類，每類佔幾多 ＝ 嗰類組合數 ÷ 總數。翻牌前按對子／高張同你牌嘅關係分；翻牌後分強牌、中等牌、draw、冇嘢。</p>
+<p><b>第 3 步：每類用錨點</b>（翻牌前，全部發晒五張）：</p>
+${T(["你","對手","你 equity"],[["對子","更大嘅對子","≈ 19%"],["對子","更細嘅對子","≈ 81%"],["對子","兩張高過你嘅牌","≈ 52%"],["對子","一高一低","≈ 70%"],["對子","兩張都細過你","≈ 82%"],["兩張高張","細過兩張嘅對子","≈ 45%"],["兩張高張","夾喺中間嘅對子","≈ 30%"],["兩張高張","大過兩張嘅對子","≈ 18%"],["同一張牌、kicker 大","（AK 對 AQ）","≈ 72%"],["同一張牌、kicker 細","（AQ 對 AK）","≈ 27%"],["兩張都大過佢","（AK 對 87）","≈ 63%"],["夾住佢","（A8 對 K5）","≈ 57%"]])}
+<p>翻牌後：比你差嘅牌，你 ≈ 100% − 佢 outs × 4（flop 睇到 river）或者 × 2（只睇下一張）；比你好嘅牌，你 ≈ 你嘅 outs × 4 或者 × 2；同一類當 50%。River 冇得追：比佢好就 100%，比佢差就 0%。</p>
+<p><b>例子：22 對 UTG open 後 call 3-bet 嘅 range</b>（JJ–88、AQs、AJs、KQs、AQo）：</p>
+${T(["類","組合","佔","你 equity","貢獻"],[["大過你嘅對子 JJ–88","4×6＝24","50%","≈ 19%","9.5%"],["兩張高張 AQs AJs KQs AQo","3×4＋12＝24","50%","≈ 52%","26%"],["合共","48","100%","","≈ 36%"]])}
+<p>心算：一半時間你差唔多死（19%），一半時間係 coin flip（52%），平均大約 35%。再加上細對子 equity realization 差、3-bet pot SPR 細，所以呢個情況 fold。</p>
+<p><b>練習</b>：喺熱力圖撳任何一格，app 會列出每類牌嘅組合、比例、錨點同心算版本，對照精確數字。</p>`},
 {id:"sizing",t:"注碼大細",go:[["去「紀錄」睇你嘅注碼習慣","hh"]],h:`
 <ul><li><b>強牌落大啲</b>：50–100% pot。微注枱對手鍾意 call，唔好落細注慳佢。</li>
 <li><b>中等牌</b>：check 或者細注，落大注只會趕走差過你嘅牌。</li>
@@ -1694,9 +1740,272 @@ $("learnList").addEventListener("click",e=>{
     try{localStorage.setItem("eqlab-read",JSON.stringify([...readSet]))}catch(err){}
     renderLearn();const d=document.querySelector(`.lesson[data-id="${id}"]`);if(d)d.open=true}});
 
+/* ===== memorisation: flashcards with spaced repetition ===== */
+const FR=[["1/3 pot",1/3],["1/2 pot",.5],["2/3 pot",2/3],["3/4 pot",.75],["1 個 pot",1],["2 個 pot",2]];
+const P=x=>Math.round(x*100)+"%";
+const MEM_DECKS=[
+{id:"odds",name:"Pot odds 同 MDF",sheet:()=>T(["對手落","Call 要","Bluff 要對手 fold","MDF"],FR.map(([n,f])=>[n,P(f/(1+2*f)),P(f/(1+f)),P(1/(1+f))])),
+ cards:()=>FR.flatMap(([n,f])=>[
+  {id:"odds-c-"+n,q:`對手落 ${n}，你 call 要幾多 equity？`,a:P(f/(1+2*f)),pool:FR.map(([,g])=>P(g/(1+2*g))),why:`要跟 ÷ 跟完個 pot ＝ ${f.toFixed(2)} ÷ ${(1+2*f).toFixed(2)}`},
+  {id:"odds-b-"+n,q:`你 bluff 落 ${n}，對手要 fold 幾多次先唔蝕？`,a:P(f/(1+f)),pool:FR.map(([,g])=>P(g/(1+g))),why:`你落嘅注 ÷（pot＋你落嘅注）`},
+  {id:"odds-m-"+n,q:`對手落 ${n}，你最少要繼續（MDF）幾多？`,a:P(1/(1+f)),pool:FR.map(([,g])=>P(1/(1+g))),why:`pot ÷（pot＋注）`}])},
+{id:"outs",name:"Outs 同機率",sheet:()=>T(["Draw","Outs"],[["同花 draw","9"],["兩頭順","8"],["卡窿順","4"],["兩張高張","6"],["同花＋兩頭順","15"],["同花＋卡窿／一對","12"],["一對變三條","2"]])+T(["Outs","Flop→River","下一張"],[[2,"8%","4%"],[4,"17%","9%"],[6,"24%","13%"],[8,"31%","17%"],[9,"35%","19%"],[12,"45%","26%"],[15,"54%","32%"]].map(r=>r.map(String)))+`<p>細 pair 中 set：大約 12%（8 次中 1 次）。2 同 4 法則：outs×4（flop 睇到 river）、outs×2（下一張）；超過 8 outs 用 outs×4−(outs−8)。</p>`,
+ cards:()=>{const D=[["同花 draw","9"],["兩頭順 draw","8"],["卡窿順 draw","4"],["兩張高張","6"],["同花＋兩頭順","15"],["同花 draw＋一張高張","12"],["一對變三條","2"]],dp=["2","4","6","8","9","12","15"];
+  const O=[[2,"8%","4%"],[4,"17%","9%"],[6,"24%","13%"],[8,"31%","17%"],[9,"35%","19%"],[12,"45%","26%"],[15,"54%","32%"]];
+  return[...D.map(([n,o])=>({id:"outs-d-"+n,q:`${n}有幾多個 outs？`,a:o,pool:dp})),
+   ...O.flatMap(([o,r,t])=>[{id:"outs-r-"+o,q:`${o} 個 outs，由 flop 睇到 river 大約幾多？`,a:r,pool:O.map(x=>x[1]),why:o>8?`${o}×4−${o-8} ≈ ${o*4-(o-8)}%`:`${o}×4 ≈ ${o*4}%`},
+     {id:"outs-t-"+o,q:`${o} 個 outs，只睇下一張大約幾多？`,a:t,pool:O.map(x=>x[2]),why:`${o}×2 ≈ ${o*2}%`}]),
+   {id:"outs-set",q:"細 pair 喺 flop 中 set（或更好）嘅機會大約幾多？",a:"12%",pool:["6%","12%","20%","25%"],why:"大約 8 次中 1 次"}]}},
+{id:"vs",name:"Preflop 對決",sheet:()=>T(["對決","大約 equity"],MATCH.map(([a,b,e])=>[`${a} vs ${b}`,`${e} : ${100-e}`])),
+ cards:()=>MATCH.map(([a,b,e])=>({id:"vs-"+a+b,q:`${a} 對 ${b}，${a} 大約有幾多 equity？`,a:e+"%",pool:MATCH.map(m=>m[2]+"%")}))},
+{id:"combo",name:"組合數",sheet:()=>T(["情況","組合數"],COMBO.map(([q,a])=>[q,a])),
+ cards:()=>COMBO.map(([q,a,why],i)=>({id:"combo-"+i,q:q+"？",a,pool:["3","4","6","8","9","12","16","1326"],why}))},
+{id:"rules",name:"注碼同規則",sheet:()=>T(["情況","答案"],RULES.map(([q,a])=>[q,a])),
+ cards:()=>RULES.map(([q,a,pool],i)=>({id:"rules-"+i,q:q+"？",a,pool}))},
+{id:"range",name:"Preflop range",gen:true,sheet:()=>`<p>呢組係隨機出題：位置＋手牌，答 open／fold，或者面對 raise 時 3-bet／call／fold。答案跟「注碼」分頁嘅參考表。</p>`+T(["位置","大約 open"],[["UTG","17%"],["MP","22%"],["CO","29%"],["BTN","45%"],["SB","38%"]])},
+{id:"calc",name:"心算練習",gen:true,sheet:()=>`<p>隨機出 pot 同注碼，即場計 call 要幾多 equity、bluff 要幾多 fold、或者 outs 換算機率。目標：5 秒內答。</p><p>Call 要 ＝ 注 ÷（pot＋2×注）。Bluff 要 ＝ 注 ÷（pot＋注）。</p>`}];
+const MATCH=[["AA","KK",81],["KK","88",80],["77","AKo",55],["22","AKo",53],["AKo","AQo",74],["AKo","KQo",74],["99","A8o",71],["AKo","76s",58],["QQ","AKs",54],["AA","AKo",93],["A5s","KQo",61],["JTs","AKo",41]];
+const COMBO=[["一對（例如 77）有幾多個組合","6","4 款花色揀 2 張：6"],["一手同花牌（例如 AKs）有幾多個組合","4"],["一手唔同花牌（例如 AKo）有幾多個組合","12"],["AK 全部（同花＋唔同花）有幾多個組合","16"],
+ ["枱面有一張 A，對手 AA 剩幾多個組合","3"],["枱面有一張 A，對手 AK 剩幾多個組合","12","A 剩 3 張 × K 4 張"],["你手上有一張 K，對手 KK 剩幾多個組合","3"],["枱面有一張 K，對手 set of K（KK）剩幾多個組合","3"],["Holdem 起手牌總共有幾多個組合","1326"],["兩張唔同大細嘅牌（例如 KQ）總共有幾多個組合","16"]];
+const RULES=[["全部 fold 到你（BTN），open raise 到幾多","2.5bb",["2bb","2.5bb","4bb","5bb"]],["全部 fold 到你（SB），open raise 到幾多","3bb",["2bb","2.5bb","3bb","5bb"]],
+ ["前面 2 個人 limp，你喺 BTN 用好牌 raise 到幾多","5bb",["3bb","4bb","5bb","7bb"]],["有位置 3-bet，大約係對手注碼幾多倍","3 倍",["2 倍","3 倍","4 倍","5 倍"]],["冇位置 3-bet，大約係對手注碼幾多倍","4 倍",["2 倍","3 倍","4 倍","6 倍"]],
+ ["4-bet 大約係對手 3-bet 嘅幾多倍","2.2–2.5 倍",["1.5 倍","2.2–2.5 倍","4 倍","5 倍"]],["你 3-bet 後被 4-bet，100bb 嘅話邊啲牌 all in","QQ+、AK",["QQ+、AK","任何 pair","AQ+","JJ+、AQ+"]],
+ ["Postflop raise 最少係對手注碼幾多倍","2.5 倍",["1.5 倍","2 倍","2.5 倍","5 倍"]],["強牌 value bet 一般落 pot 嘅幾多","50–100%",["10–20%","25–33%","50–100%","200%+"]],
+ ["單挑、有位置、乾牌面 c-bet 一般落幾多","25–33% pot",["25–33% pot","75% pot","1 個 pot","Overbet"]],["細 pair set mining，籌碼最少係 call 嘅幾多倍","15–20 倍",["5 倍","10 倍","15–20 倍","50 倍"]],
+ ["Cash game 資金最少有幾多個 buy-in","20–40 個",["5 個","10 個","20–40 個","200 個"]],["SPR 少過 3，top pair 應該點","可以全入",["可以全入","一定 fold","只係 check","細注控 pot"]],
+ ["微注枱對手 river 大注，一對通常點","多數 fold",["一定 call","多數 fold","raise","all in"]]];
+/* Leitner boxes */
+let memBox={},memDeck="all",memCard=null,memStats={};
+try{memBox=JSON.parse(localStorage.getItem("eqlab-memo")||"{}")||{};memStats=JSON.parse(localStorage.getItem("eqlab-memo-st")||"{}")||{}}catch(e){}
+const memSave=()=>{try{localStorage.setItem("eqlab-memo",JSON.stringify(memBox));localStorage.setItem("eqlab-memo-st",JSON.stringify(memStats))}catch(e){}};
+let MEM_ALL=null;const memAll=()=>MEM_ALL||(MEM_ALL=MEM_DECKS.filter(d=>!d.gen).flatMap(d=>d.cards().map(c=>({...c,deck:d.id}))));
+const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=(Math.random()*(i+1))|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+function optsFor(a,pool){const o=[a,...shuffle([...new Set(pool)].filter(x=>x!==a)).slice(0,3)];return shuffle(o)}
+function genCard(deck){
+  if(deck==="range"){
+    if(Math.random()<.55){const pos=pick(["UTG","MP","CO","BTN","SB"]),set=parseRange(OPEN[pos]);
+      const cls=Math.random()<.7?ORDER[(Math.random()*Math.min(ORDER.length,Math.round(combosIn(set)/1326*169*1.8)))|0]:pick(CLASSES);
+      return{deck,q:`全部 fold 到你喺 <b>${pos}</b>，你有 <b>${cls.key}</b>`,a:set.has(cls.key)?"Raise":"Fold",opts:["Raise","Fold"],why:`${pos} 大約 open ${Math.round(combosIn(set)/13.26)}%`}}
+    const pos=pick(["CO","BTN","SB","BB","BB"]),vs=pick(vsOptions(pos)),ref=CLASSES.filter(c=>preAction(pos,vs,c.key)!=="fold");
+    const cls=Math.random()<.7?pick(ref.length?ref:CLASSES):pick(CLASSES),r=preAction(pos,vs,cls.key);
+    return{deck,q:`<b>${vs}</b> open，你喺 <b>${pos}</b> 有 <b>${cls.key}</b>`,a:{"3bet":"3-bet",call:"Call",fold:"Fold"}[r],opts:["3-bet","Call","Fold"],why:VS_NOTE[vs]}}
+  const t=Math.random();
+  if(t<.4){const pot=10*(2+((Math.random()*18)|0)),f=pick([.25,1/3,.5,2/3,.75,1,1.5]),bet=Math.round(pot*f),req=bet/(pot+2*bet),a=Math.round(req*100);
+    const opts=shuffle([a,a+5,a-5,a+10].map(x=>x+"%"));return{deck,q:`Pot ${pot}，對手落 ${bet}。你 call 要幾多 equity？`,a:a+"%",opts,why:`${bet} ÷ (${pot}+${bet}+${bet}) = ${bet}÷${pot+2*bet}`}}
+  if(t<.7){const pot=10*(2+((Math.random()*18)|0)),f=pick([1/3,.5,2/3,.75,1]),bet=Math.round(pot*f),a=Math.round(bet/(pot+bet)*100);
+    const opts=shuffle([a,a+6,a-6,a+12].map(x=>x+"%"));return{deck,q:`Pot ${pot}，你 bluff 落 ${bet}。對手要 fold 幾多先唔蝕？`,a:a+"%",opts,why:`${bet} ÷ (${pot}+${bet})`}}
+  const o=pick([4,6,8,9,12,15]),flop=Math.random()<.5,v=flop?o*4-Math.max(0,o-8):o*2;
+  const opts=shuffle([v,v+6,Math.max(2,v-6),v+12].map(x=>x+"%"));
+  return{deck,q:`你有 ${o} 個 outs，${flop?"由 flop 睇到 river":"只睇下一張"}，大約幾多？`,a:v+"%",opts,why:flop?(o>8?`${o}×4−${o-8}`:`${o}×4`):`${o}×2`}}
+function nextMem(){
+  const deck=memDeck==="all"?pick(MEM_DECKS).id:memDeck,D=MEM_DECKS.find(d=>d.id===deck);
+  if(D.gen){memCard=genCard(deck)}
+  else{const pool=memAll().filter(c=>memDeck==="all"||c.deck===deck);
+    const w=pool.map(c=>1/Math.pow(2,(memBox[c.id]||1)-1));let x=Math.random()*w.reduce((a,b)=>a+b,0),k=0;while(x>w[k]){x-=w[k];k++}
+    const c=pool[Math.min(k,pool.length-1)];memCard={...c,opts:optsFor(c.a,c.pool)}}
+  memCard.t0=Date.now();memCard.ans=null;renderMem()}
+function deckProg(id){const D=MEM_DECKS.find(d=>d.id===id);
+  if(D.gen){const s=memStats[id]||{n:0,c:0};return s.n?`${Math.round(s.c/s.n*100)}%`:"–"}
+  const cs=memAll().filter(c=>c.deck===id);return `${cs.filter(c=>(memBox[c.id]||1)>=4).length}/${cs.length}`}
+function renderMem(){
+  const box=$("memo");
+  const chips=[["all","全部",""],...MEM_DECKS.map(d=>[d.id,d.name,deckProg(d.id)])];
+  const all=memAll(),mastered=all.filter(c=>(memBox[c.id]||1)>=4).length;
+  let h=`<div class="panel"><div class="label">背誦 <span>已掌握 ${mastered}／${all.length} 張</span></div>
+    <div class="chips">${chips.map(([id,n,p])=>`<button class="cb" data-deck="${id}" aria-pressed="${memDeck===id}">${n}${p?` <small>${p}</small>`:""}</button>`).join("")}</div>
+    ${memDeck!=="all"?`<details class="more"><summary>睇重點表</summary><div class="more-body">${MEM_DECKS.find(d=>d.id===memDeck).sheet()}</div></details>`:""}</div>`;
+  const c=memCard;
+  if(c){const D=MEM_DECKS.find(d=>d.id===c.deck);
+    h+=`<div class="panel memcard"><div class="label">${D.name}${!D.gen?` <span>熟練度 ${"●".repeat(memBox[c.id]||1)}${"○".repeat(5-(memBox[c.id]||1))}</span>`:""}</div>
+    <div class="mq">${c.q}</div>
+    <div class="mopts">${c.opts.map(o=>`<button class="mo${c.ans?(o===c.a?" right":o===c.ans?" wrong":""):""}" data-opt="${o}"${c.ans?" disabled":""}>${o}</button>`).join("")}</div>
+    ${c.ans?`<div class="verdict ${c.ans===c.a?"good":"bad"}"><span class="chip">${c.ans===c.a?"啱":"錯"}</span><span>答案：<b>${c.a}</b>${c.why?`　${c.why}`:""}　（${((c.t1-c.t0)/1000).toFixed(1)} 秒）</span></div>
+    <button class="btn primary" id="memNext">下一張</button>`:""}</div>`}
+  box.innerHTML=h}
+$("memo").addEventListener("click",e=>{
+  const d=e.target.closest("[data-deck]");if(d){memDeck=d.dataset.deck;nextMem();return}
+  const o=e.target.closest("[data-opt]");if(o&&memCard&&!memCard.ans){const c=memCard;c.ans=o.dataset.opt;c.t1=Date.now();const ok=c.ans===c.a;
+    if(c.id){memBox[c.id]=ok?Math.min(5,(memBox[c.id]||1)+1):1}
+    const s=memStats[c.deck]||{n:0,c:0};s.n++;if(ok)s.c++;memStats[c.deck]=s;memSave();renderMem();
+    if(ok)setTimeout(()=>{if(memCard===c)nextMem()},900);return}
+  if(e.target.id==="memNext")nextMem()});
+function setQuizMode(m){
+  document.querySelectorAll("#quizMode button").forEach(b=>b.setAttribute("aria-selected",b.dataset.qm===m));
+  $("quizScen").hidden=m!=="scen";$("memo").hidden=m!=="memo";
+  if(m==="memo"&&!memCard)nextMem();try{localStorage.setItem("eqlab-qm",m)}catch(e){}}
+$("quizMode").onclick=e=>{const b=e.target.closest("[data-qm]");if(b)setQuizMode(b.dataset.qm)};
+
+/* ===== equity heat map + worked formula ===== */
+let heatMode="eq",heatSel=null,heatToken=0,heatSig="",heatRes=null;
+function classCombos(c,dead){const out=[];
+  for(let a=0;a<4;a++)for(let b=0;b<4;b++){
+    if(c.type==="p"&&b<=a)continue;if(c.type==="s"&&a!==b)continue;if(c.type==="o"&&a===b)continue;
+    const x=c.hi*4+a,y=c.lo*4+b;if(!dead.has(x)&&!dead.has(y))out.push([x,y])}
+  return out}
+/* Monte Carlo equity of a set of hero combos against weighted villain ranges */
+function heatEq(heroCs,board,lists,iters){
+  if(!heroCs.length||lists.some(l=>!l.length))return null;
+  const base=new Set(board),deck=[];for(let c=0;c<52;c++)if(!base.has(c))deck.push(c);
+  const cums=lists.map(cs=>{const a=[];let t=0;for(const c of cs){t+=c[2];a.push(t)}return{a,t,cs}});
+  const pickV=k=>{const{a,t,cs}=cums[k],x=Math.random()*t;let lo=0,hi=a.length-1;while(lo<hi){const m=(lo+hi)>>1;if(a[m]>x)hi=m;else lo=m+1}return cs[lo]};
+  const need=5-board.length;let eq=0,n=0;
+  for(let it=0;it<iters;it++){
+    const h=heroCs[(Math.random()*heroCs.length)|0],used=new Set(h),vs=[];let ok=true;
+    for(let k=0;k<lists.length;k++){let v,tr=0;do{v=pickV(k);tr++}while((used.has(v[0])||used.has(v[1]))&&tr<30);
+      if(used.has(v[0])||used.has(v[1])){ok=false;break}used.add(v[0]);used.add(v[1]);vs.push(v)}
+    if(!ok)continue;
+    const run=[];while(run.length<need){const c=deck[(Math.random()*deck.length)|0];if(!used.has(c)&&!run.includes(c))run.push(c)}
+    const full=board.concat(run),hv=evalHand([h[0],h[1],...full]);let beat=false,ties=0;
+    for(const v of vs){const x=evalHand([v[0],v[1],...full]);if(x>hv){beat=true;break}if(x===hv)ties++}
+    n++;if(!beat)eq+=ties?1/(ties+1):1}
+  return n?eq/n:null}
+function heatColor(e,req){
+  if(e==null)return"background:var(--cell-o);color:var(--muted)";
+  const mid=heatMode==="odds"&&req!=null?req:.5,span=e>=mid?1-mid:mid,t=Math.min(1,Math.abs(e-mid)/Math.max(.05,span));
+  const col=e>=mid?"var(--good)":"var(--bad)",w=Math.round(t*85);
+  return `background:color-mix(in srgb,${col} ${w}%,var(--cell-o));color:${w>48?"var(--surface)":"var(--ink)"}`}
+function heatReq(){if(!facing)return null;const pot=parseFloat($("potIn").value)||0,b=parseFloat($("callIn").value)||0;return pot>0&&b>0?b/(pot+2*b):null}
+function renderHeatGrid(){
+  const req=heatReq(),R=heatRes||{};
+  const cells=CLASSES.slice().sort((a,b)=>a.row-b.row||a.col-b.col);
+  const heroKey=slots[0]!=null&&slots[1]!=null?classKey(slots[0],slots[1]):null;
+  $("heatGrid").innerHTML=cells.map(c=>{const e=R[c.key];
+    return `<button class="hcell${c.key===heroKey?" me":""}${c.key===heatSel?" sel":""}" data-hk="${c.key}" style="${heatColor(e,req)}"><span>${c.key}</span><b>${e==null?"–":Math.round(e*100)}</b></button>`}).join("");
+  $("heatModes").innerHTML=[["eq","顯示 equity"],["odds","同 pot odds 比較"]].map(([m,n])=>`<button class="cb" data-hm="${m}" aria-pressed="${heatMode===m}"${m==="odds"&&req==null?" disabled":""}>${n}</button>`).join("");
+  $("heatLegend").innerHTML=heatMode==="odds"&&req!=null?`<span class="sw" style="background:var(--bad)"></span>唔夠 ${pct(req)}，fold<span class="sw" style="background:var(--good);margin-left:10px"></span>夠，call 有著數`
+    :`<span class="sw" style="background:var(--bad)"></span>低過 50%<span class="sw" style="background:var(--cell-o);margin-left:10px"></span>50%<span class="sw" style="background:var(--good);margin-left:10px"></span>高過 50%`;
+}
+function heatSignature(board,lists){return board.join(",")+"|"+facing+"|"+lists.map(l=>l.length+":"+l.reduce((a,c)=>a+c[2],0).toFixed(2)).join(";")}
+async function runHeat(){
+  if(document.querySelector("[data-sec=heat]").hidden)return;
+  const {lists,board,hero}=buildCombos();
+  if(board.length===1||board.length===2){$("heatStatus").textContent="公共牌要 0、3、4 或 5 張。";return}
+  if(lists.some(l=>!l.length)){$("heatStatus").textContent="對手 range 入面冇手牌。";return}
+  const sig=heatSignature(board,lists);
+  if(sig!==heatSig){heatSig=sig;heatRes={};const tok=++heatToken,dead=new Set(board);
+    const L=board.length,gl=opps.map(o=>{const cs=combosFor(o,board,dead);if(AUTO_NARROW&&!o.post[L])for(const c of cs)c[2]*=wAdj(AUTO_NARROW,tierOf(c,board),o.guide);return cs.filter(c=>c[2]>.001)});
+    const iters=board.length===0?500:420,cls=CLASSES.slice();
+    for(let k=0;k<cls.length;k++){if(tok!==heatToken)return;
+      heatRes[cls[k].key]=heatEq(classCombos(cls[k],dead),board,gl,iters);
+      if(k%13===12){$("heatStatus").textContent=`計緊… ${k+1}／169`;renderHeatGrid();await new Promise(r=>setTimeout(r,0))}}
+    $("heatStatus").textContent="每格係嗰款牌所有花色嘅平均 equity（模擬，誤差大約 ±3%）。撳任何一格睇計法。"}
+  renderHeatGrid();renderHeatDemo(hero,board,lists);
+}
+/* worked example: decompose the equity into buckets of the villain range */
+function bucketsOf(heroKeyCls,board,list){
+  const B={};
+  for(const c of list){let k;
+    if(board.length>=3)k=["強牌","中等牌","Draw","冇嘢／高張"][GROUP[tierOf(c,board)]];
+    else{const r1=c[0]>>2,r2=c[1]>>2,hs=[heroKeyCls.hi,heroKeyCls.lo];
+      if(r1===r2)k=heroKeyCls.type==="p"?(r1>heroKeyCls.hi?"大過你嘅對子":r1<heroKeyCls.hi?"細過你嘅對子":"同你一樣嘅對子"):(r1>heroKeyCls.hi?"大過你兩張牌嘅對子":"其他對子");
+      else if(hs.includes(r1)||hs.includes(r2))k="同你撞點數";
+      else k="其他非對子"}
+    (B[k]=B[k]||[]).push(c)}
+  return B}
+/* mental-math anchors: preflop, per villain combo */
+function anchorPre(h,c){
+  const a=Math.max(c[0]>>2,c[1]>>2),b=Math.min(c[0]>>2,c[1]>>2),H=h.hi,L=h.lo;
+  if(h.type==="p"){
+    if(a===b)return a>H?[.19,"你細對子對佢大對子：你要中 set（約 12%）再加少少順／同花，≈ 19%"]
+      :a<H?[.81,"你大對子對佢細對子：佢要中 set，你 ≈ 81%"]:[.5,"一樣嘅對子：平手居多，≈ 50%"];
+    if(a===H||b===H)return(a===H?b:a)>H?[.66,"佢有一張同你一樣（擋咗你一張 set 牌），另一張大過你：你 ≈ 66%"]:[.88,"佢有一張同你一樣，另一張細過你：你 ≈ 88%"];
+    const ov=(a>H)+(b>H);
+    return ov===2?[.52,"佢兩張高張對你對子：差唔多 coin flip，你 ≈ 52%（佢 6 張 outs × 兩次機會）"]
+      :ov===1?[.7,"佢一張大過你、一張細過你：你 ≈ 70%"]:[.82,"佢兩張都細過你嘅對子：你 ≈ 82%"]}
+  if(a===b){
+    if(a===H)return[.08,`佢嘅對子同你大嗰張一樣（例如 AA 對 AK）：你 ≈ 8%`];
+    if(a===L)return[.3,"佢嘅對子同你細嗰張一樣（例如 KK 對 AK）：你 ≈ 30%"];
+    return a>H?[.18,"佢對子大過你兩張：你要中其中一張（6 張 outs），≈ 18%"]
+      :a>L?[.3,"佢對子夾喺你兩張中間：你得 3 張 outs，≈ 30%"]:[.45,"佢對子細過你兩張：差唔多 coin flip，你 ≈ 45%"]}
+  if(a===H&&b===L)return[.5,"同你一樣兩張：平手居多，≈ 50%"];
+  if(a===H||a===L||b===H||b===L){
+    const sh=a===H||b===H?H:L,my=sh===H?L:H,his=a===sh?b:a;
+    return my>his?[.72,"同一張牌、你 kicker 大（你壓住佢）：你 ≈ 72%"]:[.27,"同一張牌、佢 kicker 大（例如 AQ 對 AK，你被壓）：你 ≈ 27%"]}
+  if(L>a)return[.63,"你兩張都大過佢兩張：你 ≈ 63%"];
+  if(b>H)return[.37,"佢兩張都大過你兩張：你 ≈ 37%"];
+  if(H>a&&L>b)return[.57,"你大過佢、佢大過你細嗰張（夾住）：你 ≈ 57%"];
+  if(a>H&&b>L)return[.43,"佢夾住你：你 ≈ 43%"];
+  if(H>a)return[.45,"佢兩張夾喺你中間（例如 A2 對 KQ）：你 ≈ 45%"];
+  return[.55,"你兩張夾喺佢中間（例如 KQ 對 A2）：你 ≈ 55%"]}
+/* postflop anchors by group: [hero group][villain group] */
+const ANCH_POST={3:[[.5,.9,.65,.95],[.2,.5,.55,.75],[.35,.4,.5,.6],[.1,.25,.4,.5]],
+  4:[[.5,.93,.8,.97],[.1,.5,.65,.85],[.19,.2,.5,.5],[.05,.13,.45,.5]],
+  5:[[.5,1,1,1],[0,.5,.9,.9],[0,.1,.5,.5],[0,0,.5,.5]]};
+const GNAME=["強牌","中等牌","Draw","冇嘢／高張"];
+function whyPost(hg,vg,st){
+  if(st===5)return hg<vg?"river 冇得追：你比佢呢類好，≈ 100%（同類先要睇 kicker）":hg>vg?"river 冇得追：佢呢類比你好，≈ 0%":"同一類，睇邊個 pair／kicker 大，當 50% 計";
+  const m=st===3?"×4":"×2",nx=st===3?"睇到 river":"只睇下一張";
+  if(hg===vg)return`同一類：睇邊個大，當 50% 計${hg===0?"（同樣 top pair 就睇 kicker：kicker 大 ≈ 70–75%，kicker 細 ≈ 25–30%）":""}`;
+  if(vg===2&&hg<2)return`你領先，但佢有 8–9 張 outs：100% − 9${m}（${nx}）≈ ${st===3?"65":"80"}%`;
+  if(hg===2&&vg<2)return`你係 draw：你嘅 outs${m}（同花 9 張 ≈ ${st===3?"35":"19"}%，兩頭順 8 張 ≈ ${st===3?"31":"17"}%）`;
+  if(hg<vg)return`你比佢好：100% − 佢 outs${m}。佢冇乜 outs（2–5 張）就 ≈ ${st===3?"80–95":"88–97"}%`;
+  return`佢比你好：你嘅 outs${m}。改進成兩對／trips 得 2–5 張 outs，≈ ${st===3?"10–25":"5–13"}%`}
+const r5=x=>Math.round(x*20)/20;
+function rangeBreakdown(set,deadAll){
+  const cl=CLASSES.filter(c=>set.has(c.key)),g={p:[],s:[],o:[]};for(const c of cl)g[c.type].push(c.key);
+  const per={p:6,s:4,o:12},nm={p:"對子",s:"同花",o:"唔同花"},parts=[];let tot=0;
+  for(const t of ["p","s","o"]){if(!g[t].length)continue;tot+=g[t].length*per[t];
+    parts.push(`${nm[t]} ${g[t].length} 款 × ${per[t]} ＝ ${g[t].length*per[t]}${cl.length<=24?`（${g[t].join("、")}）`:""}`)}
+  const left=expand(set,deadAll).length;
+  return{tot,left,txt:parts.join("；")}}
+function renderHeatDemo(hero,board,lists){
+  const O=$("heatDemo");
+  const key=heatSel||(hero.length===2?classKey(hero[0],hero[1]):null);
+  if(!key){O.innerHTML='<div class="msg">揀你嘅手牌，或者撳熱力圖任何一格，就會示範點樣計 equity。</div>';return}
+  const cls=CLASSES.find(c=>c.key===key),dead=new Set(board);
+  let hc=heatSel?classCombos(cls,dead):[[hero[0],hero[1]]];
+  if(!heatSel&&hero.length===2)hc=[[hero[0],hero[1]]];
+  if(!hc.length){O.innerHTML=`<div class="msg">${key} 同公共牌撞牌，冇可能。</div>`;return}
+  const o=opps[0],L=lists[0],st=board.length;
+  /* step 1: count the range */
+  const steps=[];const deadAll=new Set([...board,...hc[0]]),rb=rangeBreakdown(o.range,deadAll);
+  steps.push(`<li><b>數對手 range 有幾多個組合</b>：${o.guide.custom?"自訂 range":scenarioName(o.guide.pos,o.guide.act,o.guide.vs)}。每款對子有 6 個組合，同花 4 個，唔同花 12 個（全副牌一共 1326 個）。<br>${rb.txt}，合共 <b>${rb.tot}</b> 個，大約 ${(rb.tot/13.26).toFixed(0)}% 嘅手牌。${rb.left<rb.tot?`<br>你手上${st?"同公共牌":""}嘅牌擋咗（blocker）${rb.tot-rb.left} 個：例如你拎住一張 K，佢 KK 就由 6 個變 3 個。剩返 <b>${rb.left}</b> 個。`:""}</li>`);
+  /* step 2: narrowing per street */
+  if(st>=3){let cs=expand(o.range,new Set([...hero,...board]));
+    for(const Lb of [3,4,5]){if(st<Lb)break;const act=o.post[Lb]||(Lb===st&&AUTO_NARROW?AUTO_NARROW:null);if(!act)continue;
+      for(const c of cs)c[2]*=wAdj(act,tierOf(c,board.slice(0,Lb)),o.guide);
+      const w=cs.reduce((a,c)=>a+c[2],0);steps.push(`<li><b>${STREET[Lb]}：對手 ${POST.find(p=>p[0]===act)[1]}</b>${!o.post[Lb]?"（按注碼自動判斷）":""} → 佢 range 剩返大約 ${w.toFixed(0)} 個組合。${POST_NOTE[act].split("：")[1]||""}<br><small>收窄嘅方法：每類牌按佢會唔會咁做打個折（例如 bet 大注，強牌留晒，冇嘢只留一部分做 bluff），所以組合數可以有小數。</small></li>`)}}
+  /* step 3: buckets with anchors */
+  const B=bucketsOf(cls,board,L),tot=L.reduce((a,c)=>a+c[2],0);
+  const hgCount=[0,0,0,0];if(st>=3)for(const h of hc)hgCount[GROUP[tierOf(h,board)]]++;
+  const hg=hgCount.indexOf(Math.max(...hgCount));
+  const rows=Object.entries(B).map(([k,cs])=>{const n=cs.reduce((a,c)=>a+c[2],0),p=n/tot;const e=heatEq(hc,board,[cs],st===5?1500:1200);
+    let an,why;
+    if(st===0){const sub={};let s=0;for(const c of cs){const[x,y]=anchorPre(cls,c);s+=x*c[2];(sub[y]=sub[y]||[0,x])[0]+=c[2]}an=s/n;
+      why=Object.entries(sub).sort((a,b)=>b[1][0]-a[1][0]).map(([y,[w]])=>`${Object.keys(sub).length>1?`${Math.round(w/n*100)}%：`:""}${y}`).join("<br>")}
+    else{const vg=GNAME.findIndex(g=>k.startsWith(g));an=ANCH_POST[st][hg][vg];why=whyPost(hg,vg,st)}
+    return{k,n,p,e,an,why}}).filter(r=>r.p>.005).sort((a,b)=>b.p-a.p);
+  const sum=rows.reduce((a,r)=>a+r.p*(r.e??0),0),mental=rows.reduce((a,r)=>a+r5(r.p)*r5(r.an),0);
+  const exact=lists.length>1?heatEq(hc,board,lists,3000):heatEq(hc,board,[L],3000);
+  const req=heatReq();
+  /* small pair: set mining note */
+  const small=cls.type==="p"&&cls.hi<=4,big3=["threebet","call3b","fourbet"].includes(o.guide.act)&&!o.guide.custom;
+  const pot=parseFloat($("potIn")?.value)||0,call=parseFloat($("callIn")?.value)||0;
+  const setNote=small&&st===0?`<div class="hint"><p><b>細對子：equity 唔係全部，要計 implied odds</b>　${key} 中 set 嘅機會大約 12%（8 次中 1 次）。冇中 set，對手隨便落注你都好難繼續，所以你 ${pct(exact??sum)} 嘅 equity 好難全部攞到。</p>
+  <p>要 call 得過，中 set 嗰次要贏返其餘 7 次輸嘅錢：<b>中 set 要額外贏 ≥ 7.3 × 你要 call 嘅錢 − 而家個 pot</b>。${pot>0&&call>0?`呢手：7.3 × ${call} − ${pot} ＝ <b>${Math.max(0,7.3*call-pot).toFixed(1)}</b>。`:""}對手唔係次次都會俾晒籌碼，所以經驗法則係剩低籌碼要有你 call 嘅 <b>15–20 倍</b>。</p>
+  ${T(["100bb 籌碼","普通 raise pot","3-bet pot"],[["你要 call","2.5bb","9bb（補 6.5bb）"],["翻牌前個 pot","約 6.5bb","約 19.5bb"],["每人剩低","97.5bb","91bb"],["SPR（剩低 ÷ pot）","約 15","約 4.7"],["剩低 ÷ 你 call","39 倍 ✓","14 倍 ✗"]])}
+  <p>${big3?"呢個係 3-bet pot：":""}pot 越大、籌碼相對 pot 越短（SPR 細），中 set 之後最多都係贏返剩低嗰啲，回報唔夠補返 7 次落空。所以細對子喺普通 raise pot 可以 call 去 set mine，面對 3-bet 通常 fold。</p></div>`:"";
+  O.innerHTML=`<div class="label">計法示範：${heatSel?`${key}（所有花色平均）`:`你嘅 ${key}`} <span>對手 1</span></div>
+  <ol class="steps">${steps.join("")}
+  <li><b>將對手 range 分類</b>：每類「佔幾多」＝ 嗰類組合數 ÷ 總數，再估你對每一類有幾多 equity：
+  <div class="tbl"><table class="sz"><thead><tr><th>對手呢類牌</th><th>佔幾多</th><th>你嘅 equity</th><th>貢獻</th></tr></thead><tbody>
+  ${rows.map(r=>`<tr><td>${r.k}<br><small>${r.n%1?r.n.toFixed(1):r.n} 個</small></td><td>${pct(r.p)}</td><td>${r.e==null?"–":pct(r.e)}</td><td>${pct(r.p*(r.e??0))}</td></tr>`).join("")}
+  </tbody></table></div></li>
+  <li><b>每類點解係呢個 equity（心算錨點）</b>：<ul class="why">${rows.map(r=>`<li><b>${r.k}</b>（錨點 ≈ ${Math.round(r5(r.an)*100)}%）<br>${r.why}</li>`).join("")}</ul></li>
+  <li><b>加權平均</b>：equity ≈ ${rows.map(r=>`${(r.p*100).toFixed(0)}%×${r.e==null?"–":(r.e*100).toFixed(0)+"%"}`).join(" ＋ ")} ≈ <b>${pct(sum)}</b>${exact!=null?`（直接模擬：${pct(exact)}${lists.length>1?`，對 ${lists.length} 個對手`:""}）`:""}。</li>
+  <li><b>心算版本</b>：比例同錨點都執到最近 5%：${rows.map(r=>`${Math.round(r5(r.p)*100)}%×${Math.round(r5(r.an)*100)}%`).join(" ＋ ")} ≈ <b>${(mental*100).toFixed(0)}%</b>。同 app 精確數差 ${Math.abs(mental-(exact??sum))*100<1?"唔夠 1":Math.round(Math.abs(mental-(exact??sum))*100)}%${Math.abs(mental-(exact??sum))<=.05?"，夠用嚟決定 call 定 fold。":"。差得多通常係因為花色、順子或者 kicker 細節，錨點冇計到。"}</li>
+  ${req!=null?`<li><b>同 pot odds 比較</b>：call 要 ${pct(req)}，你有 ${pct(exact??sum)}，${(exact??sum)>=req?"夠，call 有著數":"唔夠，應該 fold"}。</li>`:""}</ol>
+  ${setNote}
+  <div class="hint"><p>公式：<b>Equity ≈ Σ（每類牌佔對手 range 嘅比例 × 你對嗰類牌嘅 equity）</b>。對手每做一個動作，各類牌嘅比例就會變，你嘅 equity 跟住變。完整錨點表喺「教學」→「用分類心算 equity」。</p></div>`;
+}
+$("heatGrid").addEventListener("click",e=>{const b=e.target.closest("[data-hk]");if(!b)return;heatSel=heatSel===b.dataset.hk?null:b.dataset.hk;
+  const {lists,board,hero}=buildCombos();renderHeatGrid();renderHeatDemo(hero,board,lists)});
+$("heatModes").addEventListener("click",e=>{const b=e.target.closest("[data-hm]");if(!b||b.disabled)return;heatMode=b.dataset.hm;renderHeatGrid()});
+
 buildPicker();loadSample();renderStats();renderLearn();
+try{const qm=localStorage.getItem("eqlab-qm");if(qm==="memo")setQuizMode("memo")}catch(e){}
 try{const t=localStorage.getItem("eqlab-hh");if(t)hhLoad(t,false)}catch(e){}
-try{const sec=localStorage.getItem("eqlab-sec");if(sec&&["cards","opp","bet"].includes(sec))showSec(sec)}catch(e){}
+try{const sec=localStorage.getItem("eqlab-sec");if(sec&&["cards","opp","bet","heat"].includes(sec))showSec(sec)}catch(e){}
 </script>
 
 <script>
